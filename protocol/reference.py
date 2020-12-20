@@ -8,8 +8,8 @@ from datetime import datetime
 from base64 import b64encode, b64decode
 from more_itertools import sliced
 
-from cryptography.hazmat.primitives.serialization import PublicFormat
-from cryptography.hazmat.primitives.serialization import Encoding
+from cryptography.hazmat.primitives.serialization import PublicFormat, PrivateFormat
+from cryptography.hazmat.primitives.serialization import Encoding, BestAvailableEncryption, load_pem_private_key
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
@@ -157,6 +157,8 @@ class CertFile:
         if _authorize_cert is not None:
             if self.verify(_authorize_cert):
                 self._cert.Authorize = _authorize_cert
+        else:
+            self._cert.Authorize = None
 
         return self._cert
 
@@ -164,6 +166,9 @@ class CertFile:
         if _authorize_cert is None:
             _authorize_cert = self._cert.PubkeySign
         else:
+            if _authorize_cert.Handle != self._cert.Authorize and _authorize_cert.Handle != self._cert.Handle:
+                return False
+
             _authorize_cert = _authorize_cert.PubkeySign
         
         try:
@@ -232,7 +237,7 @@ class CertFile:
                            PubkeyRecv   = pubkey_recv_nums.public_key(backend=default_backend()),
                            Flags        = certdata["Flags"].split(", ") if certdata["Flags"] != "-" else [],
                            IssuedDate   = certdata["IssuedDate"],
-                           Authorize    = None
+                           Authorize    = certdata["Authorize"]
                            )
 
         return CertFile(orig_certfile, cert, signature)
@@ -246,3 +251,41 @@ def _generateKeys(length):
     privkey = rsa.generate_private_key(backend=default_backend(), public_exponent=65537, key_size=length)
     pubkey = privkey.public_key()
     return pubkey, privkey
+
+def storeCert(cert, privkey_sign, privkey_recv, to, sign=None, passphrase="-"):
+    if sign is None:
+        sign = privkey_sign
+
+    passphrase = passphrase.encode("utf-8")
+
+    f = open(to + ".certfile", "w")
+    f.write(cert.build_signed(sign))
+    f.close()
+
+    f = open(to + ".sign.privkey", "wb")
+    pem = privkey_sign.private_bytes(
+       encoding=Encoding.PEM,
+       format=PrivateFormat.PKCS8,
+       encryption_algorithm=BestAvailableEncryption(passphrase)
+    )
+    f.write(pem)
+    f.close()
+
+    f = open(to + ".recv.privkey", "wb")
+    pem = privkey_recv.private_bytes(
+       encoding=Encoding.PEM,
+       format=PrivateFormat.PKCS8,
+       encryption_algorithm=BestAvailableEncryption(passphrase)
+    )
+    f.write(pem)
+    f.close()
+
+def loadPrivateKey(to, type, passphrase="-"):
+    passphrase = passphrase.encode("utf-8")
+
+    f = open(to + "." + type + ".privkey", "rb")
+    pem = f.read()
+    f.close()
+
+    return load_pem_private_key(pem, password=passphrase, backend=default_backend())
+    
