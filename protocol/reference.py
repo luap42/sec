@@ -4,6 +4,17 @@
     Reference Implementation.
 """
 
+from datetime import datetime
+from base64 import b64encode, b64decode
+from more_itertools import sliced
+
+from cryptography.hazmat.primitives.serialization import PublicFormat
+from cryptography.hazmat.primitives.serialization import Encoding
+from cryptography.hazmat.primitives.asymmetric import rsa, padding
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+from cryptography.exceptions import InvalidSignature
+
 class Certificate:
     
     def __init__(self, Type,
@@ -15,11 +26,13 @@ class Certificate:
                        IssuedDate,
                        Authorize):
         """
-            DO NOT CALL Certificate.__init__!
+            DO NOT EVER CALL Certificate.__init__!
             Use any of the other provided methods for Instantiation, namely:
 
+             * Certificate.newService
+             * Certificate.newUser
              * Certificate.new
-             * Certificate.loadFromFile
+             * CertFile.load
 
             DO NOT USE THIS METHOD. This method is for internal use only!
         """
@@ -31,6 +44,52 @@ class Certificate:
         self.Flags          = Flags
         self.IssuedDate     = IssuedDate
         self.Authorize      = Authorize
+
+    def build(self):
+        """
+            Certificate.build returns a copy of the certificate,
+            in the scheme defined in the SECTP standard.
+        """
+
+        pubkey_sign = self.PubkeySign.public_numbers().n
+        pubkey_recv = self.PubkeyRecv.public_numbers().n
+
+        pubkey_sign = b64encode(str(pubkey_sign).encode("utf-8")).decode("utf-8")
+        pubkey_recv = b64encode(str(pubkey_recv).encode("utf-8")).decode("utf-8")
+
+        pubkey_sign = "\n".join(sliced(pubkey_sign, 42))
+        pubkey_recv = "\n".join(sliced(pubkey_recv, 42))
+        
+        return \
+f"""
++++SECTP.1/Certfile+++
+Type: {self.Type}
+Name: {self.Name}
+Handle: {self.Handle}
+PubkeySign: |
+{pubkey_sign}
+PubkeyRecv: |
+{pubkey_recv}
+Flags: {", ".join(self.Flags) if len(self.Flags) > 0 else "-"}
+IssuedDate: {self.IssuedDate}
+Authorize: {"self" if self.Authorize is None else self.Authorize.Handle}
+""".strip()
+
+    def build_signed(self, privkey_sign):
+        certificate = self.build()
+        signature = privkey_sign.sign(
+            certificate.encode("utf-8"),
+            padding.PSS(
+                mgf=padding.MGF1(hashes.SHA256()),
+                salt_length=padding.PSS.MAX_LENGTH
+            ),
+            hashes.SHA256()
+        )
+        signature = b64encode(signature).decode("utf-8")
+        
+        signature_line = "***signed: " + signature + " at " + str(datetime.now())
+
+        return certificate + "\n" + signature_line
 
     @classmethod
     def new(cls, Type, Name, Handle, Flags, Authorize):
@@ -47,7 +106,18 @@ class Certificate:
 
             PREFER USING Certificate.newService OR Certificate.newUser TO THIS METHOD!
         """
-        pass
+        
+        if Type == "Service":
+            key_sign = _generateKeys(4096)
+            key_recv = _generateKeys(4096)
+        else:
+            key_sign = _generateKeys(2048)
+            key_recv = _generateKeys(2048)
+
+        pubkey_sign, privkey_sign = key_sign
+        pubkey_recv, privkey_recv = key_recv
+
+        return Certificate(Type, Name, Handle, pubkey_sign, pubkey_recv, Flags, datetime.now(), Authorize), privkey_sign, privkey_recv
 
     @classmethod
     def newService(cls, Name, URL):
@@ -76,7 +146,103 @@ class Certificate:
         """
         return cls.new("User", Name, Handle, Flags, Authorize)
 
+class CertFile:
+
+    def __init__(self, certfile, cert, signature=None):
+        self._cert      = cert
+        self._certfile  = certfile
+        self._signature = signature
+
+    def cert(self, _authorize_cert=None):
+        if _authorize_cert is not None:
+            if self.verify(_authorize_cert):
+                self._cert.Authorize = _authorize_cert
+
+        return self._cert
+
+    def verify(self, _authorize_cert=None):
+        if _authorize_cert is None:
+            _authorize_cert = self._cert.PubkeySign
+        else:
+            _authorize_cert = _authorize_cert.PubkeySign
+        
+        try:
+            _authorize_cert.verify(
+                b64decode(self._signature.encode("utf-8")),
+                self._certfile.encode("utf-8"),
+                padding.PSS(
+                    mgf=padding.MGF1(hashes.SHA256()),
+                    salt_length=padding.PSS.MAX_LENGTH
+                ),
+                hashes.SHA256()
+            )
+        except InvalidSignature:
+            return False
+        else:
+            return True
+    
+    @classmethod
+    def load(cls, file_name):
+        f = open(file_name, "r")
+        contents = f.read()
+        f.close()
+
+        return cls.parse(contents)
+
+    @classmethod
+    def parse(self, certfile):
+        certfile = certfile.split("\n")
+        if certfile[0] != "+++SECTP.1/Certfile+++":
+            raise ValueError("Invalid Certfile: missing header")
+        if certfile[-1].startswith("***signed: "):
+            signature_line = certfile[-1]
+            orig_certfile = "\n".join(certfile[:-1])
+            certfile = certfile[1:-1]
+        else:
+            signature_line = None
+            orig_certfile = "\n".join(certfile[:])
+            certfile = certfile[1:]
+
+        signature = signature_line.split(" ")[1]
+
+        certdata = {}
+        i = 0
+        while i < len(certfile):
+            line = certfile[i]
+            key, value = line.split(": ")
+            if value == "|":
+                value = ""
+                i += 1
+                while i < len(certfile) and ": " not in certfile[i]:
+                    value += certfile[i]
+                    i += 1
+                # Decrement once more at last. So that the end line is counted normally too
+                i -= 1
+            
+            certdata[key.strip()] = value.strip()
+            i += 1
+        
+        pubkey_sign_nums = rsa.RSAPublicNumbers(65537, int(b64decode(certdata["PubkeySign"].encode("utf-8")).decode("utf-8")))
+        pubkey_recv_nums = rsa.RSAPublicNumbers(65537, int(b64decode(certdata["PubkeyRecv"].encode("utf-8")).decode("utf-8")))
+
+        cert = Certificate(Type         = certdata["Type"],
+                           Name         = certdata["Name"],
+                           Handle       = certdata["Handle"],
+                           PubkeySign   = pubkey_sign_nums.public_key(backend=default_backend()),
+                           PubkeyRecv   = pubkey_recv_nums.public_key(backend=default_backend()),
+                           Flags        = certdata["Flags"].split(", ") if certdata["Flags"] != "-" else [],
+                           IssuedDate   = certdata["IssuedDate"],
+                           Authorize    = None
+                           )
+
+        return CertFile(orig_certfile, cert, signature)
+
 
 class Message:
     pass
 
+
+def _generateKeys(length):
+    privkey = rsa.generate_private_key(backend=default_backend(), public_exponent=65537, key_size=length)
+    pubkey = privkey.public_key()
+    return pubkey, privkey
