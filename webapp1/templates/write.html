@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block body %}
+<h1>Nachricht verfassen</h1>
+
+<form action="" method="POST">
+    <label for="to">Empfänger:</label>
+    <input id="to" name="to" placeholder="Kennung@Adresse">
+
+    <label for="subject">Betreff:</label>
+    <input id="subject" name="subject" placeholder="">
+
+    <label for="body">Nachricht:</label>
+    <textarea id="body" name="body"></textarea>
+
+    <button type="submit">Absenden</button>
+</form>
+{% endblock %}

@@ -1,0 +1,114 @@
+* { box-sizing: border-box; }
+html {
+    font-family: 'Roboto', 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif, 'Segoe UI Emoji';
+    background-color: #eee;
+}
+html, body {
+    margin: 0;
+    padding: 0;
+}
+._container {
+    max-width: 60rem;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0.25rem;
+}
+header ._container, nav ._container {
+    padding: 0;
+}
+
+header {
+    background-color: white;
+    padding: 2rem;
+}
+header .brand {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #06a;
+}
+header .claim {
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #84c2eb;
+}
+
+nav {
+    background-color: #06a;
+    background-image: linear-gradient(135deg, #0066aa 25%, #0060a0 25%, #0060a0 50%, #0066aa 50%, #0066aa 75%, #0060a0 75%, #0060a0 100%);
+background-size: 8.49px 8.49px;
+}
+nav ._container {
+    display: flex;
+    width: 100%;
+    max-width: 61rem;
+    margin: 0 auto;
+    align-items: center;
+    flex-wrap: wrap;
+}
+nav a {
+    color: white;
+    font-weight: bold;
+    padding: 0.5rem 0.75rem
+}
+nav a:hover {
+    color: white;
+}
+
+main {
+    max-width: 48rem;
+    background-color: white;
+    padding: 2.5rem 3.5rem;
+    border: 1px solid #ddd;
+    margin-top: 2rem;
+    min-height: 100vh;
+}
+p {
+    line-height: 1.5;
+}
+
+a {
+    text-decoration: none;
+    color: #06a;
+    transition: all .3s ease;
+}
+a:hover {
+    text-decoration: underline;
+    color: #048;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+form label {
+    margin-top: 1rem;
+    margin-bottom: 0.125rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+form input, form textarea {
+    padding: 0.5rem;
+    border: 1px solid #aaa;
+    font: inherit;
+    margin: 0.125rem 0;
+    border-radius: 0.25rem;
+}
+form textarea {
+    min-height: 250px;
+    resize: vertical;
+}
+form button[type="submit"] {
+    display: block;
+    max-width: fit-content;
+    background-color: #06a;
+    color: white;
+    border: 2px solid transparent;
+    border-radius: 0.25rem;
+    padding: 0.5rem 1rem;
+    margin: 0.125rem 0;
+    cursor: pointer;
+}
+form button[type="submit"]:active {
+    border-color: #006;
+}

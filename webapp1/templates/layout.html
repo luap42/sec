@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEKp-WebApp</title>
+    <link rel="stylesheet" href="/static/webapp.css">
+</head>
+<body>
+    <header>
+        <div class="_container">
+            <div class="brand">SEKp</div>
+            <div class="claim">Sichere Elektronische Kommunikationsplattform</div>
+        </div>
+    </header>
+    <nav>
+        <div class="_container">
+            <a href="{{ url_for('ui.index') }}">Startseite</a>
+            {% if session.in %}
+                <a href="{{ url_for('ui.inbox') }}">Posteingang</a>
+                <a href="{{ url_for('ui.write') }}">Nachricht verfassen</a>
+                <a href="{{ url_for('ui.logout') }}">Abmelden</a>
+            {% else %}
+                <a href="{{ url_for('ui.login') }}">Anmelden</a>
+            {% endif %}
+        </div>
+    </nav>
+    <div class="_container">
+        <main>
+            {% block body %}
+            {% endblock body %}
+        </main>
+    </div>
+</body>
+</html>
