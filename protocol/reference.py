@@ -74,7 +74,7 @@ PubkeySign: |
 PubkeyRecv: |
 {pubkey_recv}
 Flags: {", ".join(self.Flags) if len(self.Flags) > 0 else "-"}
-IssuedDate: {self.IssuedDate}
+IssuedDate: {self.IssuedDate.isoformat()}
 Authorize: {"self" if self.Authorize is None else self.Authorize.Handle}
 """.strip()
 
@@ -213,22 +213,7 @@ class CertFile:
 
         signature = signature_line.split(" ")[1]
 
-        certdata = {}
-        i = 0
-        while i < len(certfile):
-            line = certfile[i]
-            key, value = line.split(": ")
-            if value == "|":
-                value = ""
-                i += 1
-                while i < len(certfile) and ": " not in certfile[i]:
-                    value += certfile[i]
-                    i += 1
-                # Decrement once more at last. So that the end line is counted normally too
-                i -= 1
-            
-            certdata[key.strip()] = value.strip()
-            i += 1
+        certdata = _readFormat(certfile)
         
         pubkey_sign_nums = rsa.RSAPublicNumbers(65537, int(b64decode(certdata["PubkeySign"].encode("utf-8")).decode("utf-8")))
         pubkey_recv_nums = rsa.RSAPublicNumbers(65537, int(b64decode(certdata["PubkeyRecv"].encode("utf-8")).decode("utf-8")))
@@ -239,7 +224,7 @@ class CertFile:
                            PubkeySign   = pubkey_sign_nums.public_key(backend=default_backend()),
                            PubkeyRecv   = pubkey_recv_nums.public_key(backend=default_backend()),
                            Flags        = certdata["Flags"].split(", ") if certdata["Flags"] != "-" else [],
-                           IssuedDate   = certdata["IssuedDate"],
+                           IssuedDate   = datetime.fromisoformat(certdata["IssuedDate"]),
                            Authorize    = certdata["Authorize"]
                            )
 
@@ -253,8 +238,7 @@ class Message:
                        Body,
                        Author,
                        Recipient,
-                       MessageDate,
-                       Signature = ""):
+                       MessageDate):
         """
             
         """
@@ -264,7 +248,6 @@ class Message:
         self.Author         = Author
         self.Recipient      = Recipient
         self.MessageDate    = MessageDate
-        self.Signature      = Signature
 
     def encrypt(self, recipient_cert):
         """
@@ -272,7 +255,7 @@ class Message:
             SECTP standard and returns a :_MessageWrapper: object.
         """
 
-        body = b64encode(self.Body.encode("utf-8")).decode("utf-8")
+        body = b64encode(self.Body).decode("utf-8")
         body = "\n".join(sliced(body, 42))
 
         inner_template = \
@@ -320,7 +303,7 @@ Author: {self.message.Author.Handle}
 Key: {key}
 Message: |
 {message}
-MessageDate: {self.message.MessageDate}
+MessageDate: {self.message.MessageDate.isoformat()}
 """.strip()
 
     def build_signed(self, privkey_sign):
@@ -339,6 +322,81 @@ MessageDate: {self.message.MessageDate}
 
         return message + "\n" + signature_line
 
+class MessageLoader:
+
+    def __init__(self, orig_message, msgdata, signature):
+        self._orig_message = orig_message
+        self._msgdata = msgdata
+        self._signature = signature
+
+    def author_untrusted(self):
+        return self._msgdata["Author"]
+
+    def verify(self, cert):
+        if self.author_untrusted() != cert.Handle:
+            return False
+        try:
+            cert.PubkeySign.verify(
+                b64decode(self._signature.encode("utf-8")),
+                self._orig_message.encode("utf-8"),
+                padding.PSS(
+                    mgf=padding.MGF1(hashes.SHA256()),
+                    salt_length=padding.PSS.MAX_LENGTH
+                ),
+                hashes.SHA256()
+            )
+        except InvalidSignature:
+            return False
+        else:
+            return True
+
+    def decrypt(self, key):
+        session_key = b64decode(self._msgdata["Key"].encode("utf-8"))
+        session_key = key.decrypt(
+            session_key,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None
+            )
+        )
+        f = Fernet(session_key)
+        inner_message = f.decrypt(b64decode(self._msgdata["Message"].encode("utf-8")))
+        inner_message = inner_message.decode("utf-8").split("\n")
+        msgdata = self._msgdata
+        msgdata.update(_readFormat(inner_message))
+        del msgdata["Message"], msgdata["Key"]
+        msgdata["Body"] = b64decode(msgdata["Body"].encode("utf-8"))
+
+        return Message(msgdata["Subject"], msgdata["DataType"], msgdata["Body"], msgdata["Author"], None, datetime.fromisoformat(msgdata["MessageDate"]))
+
+    @classmethod
+    def load(cls, file_name):
+        f = open(file_name, "r")
+        contents = f.read()
+        f.close()
+
+        return cls.parse(contents)
+
+    @classmethod
+    def parse(self, message):
+        message = message.split("\n")
+        if message[0] != "+++SECTP.1/Message+++":
+            raise ValueError("Invalid message: missing header")
+        if message[-1].startswith("***signed: "):
+            signature_line = message[-1]
+            orig_message = "\n".join(message[:-1])
+            message = message[1:-1]
+        else:
+            signature_line = None
+            orig_message = "\n".join(message[:])
+            message = message[1:]
+
+        signature = signature_line.split(" ")[1]
+
+        msgdata = _readFormat(message)
+
+        return MessageLoader(orig_message, msgdata, signature)
 
 def _generateKeys(length):
     privkey = rsa.generate_private_key(backend=default_backend(), public_exponent=65537, key_size=length)
@@ -382,3 +440,22 @@ def loadPrivateKey(to, type, passphrase="-"):
 
     return load_pem_private_key(pem, password=passphrase, backend=default_backend())
     
+def _readFormat(format):
+    data = {}
+    i = 0
+    while i < len(format):
+        line = format[i]
+        key, value = line.split(": ")
+        if value == "|":
+            value = ""
+            i += 1
+            while i < len(format) and ": " not in format[i]:
+                value += format[i]
+                i += 1
+            # Decrement once more at last. So that the end line is counted normally too
+            i -= 1
+        
+        data[key.strip()] = value.strip()
+        i += 1
+    
+    return data

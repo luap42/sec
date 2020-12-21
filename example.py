@@ -44,11 +44,29 @@ def task5():
 
     cf, rcf = cf.cert(), rcf.cert()
 
-    m = Message("Hello World!", "text/raw", "Hello World! This is a message", cf, rcf, datetime.now())
+    m = Message("Hello World!", "text/raw", b"Hello World! This is a message", cf, rcf, datetime.now())
     mw = m.encrypt(rcf)
-    print(mw.build_signed(privkey_sign))
+    
+    f = open("data/message.msg.crypted", "w")
+    f.write(mw.build_signed(privkey_sign))
+    f.close()
+
+def task6():
+    cf = CertFile.load("data/luap42.certfile")
+    privkey_recv = loadPrivateKey("data/codidact", "recv")
+
+    cf = cf.cert()
+
+    m = MessageLoader.load("data/message.msg.crypted")
+    print(m.verify(cf))
+    m = m.decrypt(privkey_recv)
+
+    print(m.Subject)
+    print(m.Body)
+    
 
 if False:
+    pass
     print("\n\nTask 1:\n---")
     task1()
     print("\n\nTask 2:\n---")
@@ -57,5 +75,7 @@ if False:
     task3()
     print("\n\nTask 4:\n---")
     task4()
-print("\n\nTask 5:\n---")
-task5()
+    print("\n\nTask 5:\n---")
+    task5()
+print("\n\nTask 6:\n---")
+task6()
