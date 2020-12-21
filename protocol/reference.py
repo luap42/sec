@@ -18,16 +18,17 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.exceptions import InvalidSignature
 
+
 class Certificate:
-    
+
     def __init__(self, Type,
-                       Name,
-                       Handle,
-                       PubkeySign,
-                       PubkeyRecv,
-                       Flags,
-                       IssuedDate,
-                       Authorize):
+                 Name,
+                 Handle,
+                 PubkeySign,
+                 PubkeyRecv,
+                 Flags,
+                 IssuedDate,
+                 Authorize):
         """
             DO NOT EVER CALL Certificate.__init__!
             Use any of the other provided methods for Instantiation, namely:
@@ -39,14 +40,14 @@ class Certificate:
 
             DO NOT USE THIS METHOD. This method is for internal use only!
         """
-        self.Type           = Type
-        self.Name           = Name
-        self.Handle         = Handle
-        self.PubkeySign     = PubkeySign
-        self.PubkeyRecv     = PubkeyRecv
-        self.Flags          = Flags
-        self.IssuedDate     = IssuedDate
-        self.Authorize      = Authorize
+        self.Type = Type
+        self.Name = Name
+        self.Handle = Handle
+        self.PubkeySign = PubkeySign
+        self.PubkeyRecv = PubkeyRecv
+        self.Flags = Flags
+        self.IssuedDate = IssuedDate
+        self.Authorize = Authorize
 
     def build(self):
         """
@@ -57,14 +58,16 @@ class Certificate:
         pubkey_sign = self.PubkeySign.public_numbers().n
         pubkey_recv = self.PubkeyRecv.public_numbers().n
 
-        pubkey_sign = b64encode(str(pubkey_sign).encode("utf-8")).decode("utf-8")
-        pubkey_recv = b64encode(str(pubkey_recv).encode("utf-8")).decode("utf-8")
+        pubkey_sign = b64encode(
+            str(pubkey_sign).encode("utf-8")).decode("utf-8")
+        pubkey_recv = b64encode(
+            str(pubkey_recv).encode("utf-8")).decode("utf-8")
 
         pubkey_sign = "\n".join(sliced(pubkey_sign, 42))
         pubkey_recv = "\n".join(sliced(pubkey_recv, 42))
-        
+
         return \
-f"""
+            f"""
 +++SECTP.1/Certfile+++
 Type: {self.Type}
 Name: {self.Name}
@@ -89,8 +92,9 @@ Authorize: {"self" if self.Authorize is None else self.Authorize.Handle}
             hashes.SHA256()
         )
         signature = b64encode(signature).decode("utf-8")
-        
-        signature_line = "***signed: " + signature + " at " + str(datetime.now())
+
+        signature_line = "***signed: " + \
+            signature + " at " + str(datetime.now())
 
         return certificate + "\n" + signature_line
 
@@ -109,7 +113,7 @@ Authorize: {"self" if self.Authorize is None else self.Authorize.Handle}
 
             PREFER USING Certificate.newService OR Certificate.newUser TO THIS METHOD!
         """
-        
+
         if Type == "Service":
             key_sign = _generateKeys(4096)
             key_recv = _generateKeys(4096)
@@ -133,7 +137,7 @@ Authorize: {"self" if self.Authorize is None else self.Authorize.Handle}
                 (new Certificate, privkey_sign, privkey_recv)
         """
         return cls.new("Service", Name, URL, [], None)
-    
+
     @classmethod
     def newUser(cls, Name, Handle, Flags, Authorize):
         """
@@ -149,11 +153,12 @@ Authorize: {"self" if self.Authorize is None else self.Authorize.Handle}
         """
         return cls.new("User", Name, Handle, Flags, Authorize)
 
+
 class CertFile:
 
     def __init__(self, certfile, cert, signature=None):
-        self._cert      = cert
-        self._certfile  = certfile
+        self._cert = cert
+        self._certfile = certfile
         self._signature = signature
 
     def cert(self, _authorize_cert=None):
@@ -173,7 +178,7 @@ class CertFile:
                 return False
 
             _authorize_cert = _authorize_cert.PubkeySign
-        
+
         try:
             _authorize_cert.verify(
                 b64decode(self._signature.encode("utf-8")),
@@ -188,7 +193,7 @@ class CertFile:
             return False
         else:
             return True
-    
+
     @classmethod
     def load(cls, file_name):
         f = open(file_name, "r")
@@ -214,40 +219,46 @@ class CertFile:
         signature = signature_line.split(" ")[1]
 
         certdata = _readFormat(certfile)
-        
-        pubkey_sign_nums = rsa.RSAPublicNumbers(65537, int(b64decode(certdata["PubkeySign"].encode("utf-8")).decode("utf-8")))
-        pubkey_recv_nums = rsa.RSAPublicNumbers(65537, int(b64decode(certdata["PubkeyRecv"].encode("utf-8")).decode("utf-8")))
 
-        cert = Certificate(Type         = certdata["Type"],
-                           Name         = certdata["Name"],
-                           Handle       = certdata["Handle"],
-                           PubkeySign   = pubkey_sign_nums.public_key(backend=default_backend()),
-                           PubkeyRecv   = pubkey_recv_nums.public_key(backend=default_backend()),
-                           Flags        = certdata["Flags"].split(", ") if certdata["Flags"] != "-" else [],
-                           IssuedDate   = datetime.fromisoformat(certdata["IssuedDate"]),
-                           Authorize    = certdata["Authorize"]
+        pubkey_sign_nums = rsa.RSAPublicNumbers(65537, int(
+            b64decode(certdata["PubkeySign"].encode("utf-8")).decode("utf-8")))
+        pubkey_recv_nums = rsa.RSAPublicNumbers(65537, int(
+            b64decode(certdata["PubkeyRecv"].encode("utf-8")).decode("utf-8")))
+
+        cert = Certificate(Type=certdata["Type"],
+                           Name=certdata["Name"],
+                           Handle=certdata["Handle"],
+                           PubkeySign=pubkey_sign_nums.public_key(
+                               backend=default_backend()),
+                           PubkeyRecv=pubkey_recv_nums.public_key(
+                               backend=default_backend()),
+                           Flags=certdata["Flags"].split(
+                               ", ") if certdata["Flags"] != "-" else [],
+                           IssuedDate=datetime.fromisoformat(
+                               certdata["IssuedDate"]),
+                           Authorize=certdata["Authorize"]
                            )
 
         return CertFile(orig_certfile, cert, signature)
 
 
 class Message:
-    
+
     def __init__(self, Subject,
-                       DataType,
-                       Body,
-                       Author,
-                       Recipient,
-                       MessageDate):
+                 DataType,
+                 Body,
+                 Author,
+                 Recipient,
+                 MessageDate):
         """
-            
+
         """
-        self.Subject        = Subject
-        self.DataType       = DataType
-        self.Body           = Body
-        self.Author         = Author
-        self.Recipient      = Recipient
-        self.MessageDate    = MessageDate
+        self.Subject = Subject
+        self.DataType = DataType
+        self.Body = Body
+        self.Author = Author
+        self.Recipient = Recipient
+        self.MessageDate = MessageDate
 
     def encrypt(self, recipient_cert):
         """
@@ -259,7 +270,7 @@ class Message:
         body = "\n".join(sliced(body, 42))
 
         inner_template = \
-f"""
+            f"""
 Subject: {self.Subject}
 DataType: {self.DataType}
 Body: |
@@ -274,7 +285,7 @@ Body: |
 
 
 class _MessageWrapper:
-    
+
     def __init__(self, cryptotext, full_key, message, recipient_cert):
         self.cryptotext = cryptotext
         self.full_key = full_key
@@ -295,9 +306,9 @@ class _MessageWrapper:
 
         message = b64encode(self.cryptotext).decode("utf-8")
         message = "\n".join(sliced(message, 42))
-        
+
         return \
-f"""
+            f"""
 +++SECTP.1/Message+++
 Author: {self.message.Author.Handle}
 Key: {key}
@@ -317,10 +328,12 @@ MessageDate: {self.message.MessageDate.isoformat()}
             hashes.SHA256()
         )
         signature = b64encode(signature).decode("utf-8")
-        
-        signature_line = "***signed: " + signature + " at " + str(datetime.now())
+
+        signature_line = "***signed: " + \
+            signature + " at " + str(datetime.now())
 
         return message + "\n" + signature_line
+
 
 class MessageLoader:
 
@@ -361,7 +374,8 @@ class MessageLoader:
             )
         )
         f = Fernet(session_key)
-        inner_message = f.decrypt(b64decode(self._msgdata["Message"].encode("utf-8")))
+        inner_message = f.decrypt(
+            b64decode(self._msgdata["Message"].encode("utf-8")))
         inner_message = inner_message.decode("utf-8").split("\n")
         msgdata = self._msgdata
         msgdata.update(_readFormat(inner_message))
@@ -398,10 +412,13 @@ class MessageLoader:
 
         return MessageLoader(orig_message, msgdata, signature)
 
+
 def _generateKeys(length):
-    privkey = rsa.generate_private_key(backend=default_backend(), public_exponent=65537, key_size=length)
+    privkey = rsa.generate_private_key(
+        backend=default_backend(), public_exponent=65537, key_size=length)
     pubkey = privkey.public_key()
     return pubkey, privkey
+
 
 def storeCert(cert, privkey_sign, privkey_recv, to, sign=None, passphrase="-"):
     if sign is None:
@@ -415,21 +432,22 @@ def storeCert(cert, privkey_sign, privkey_recv, to, sign=None, passphrase="-"):
 
     f = open(to + ".sign.privkey", "wb")
     pem = privkey_sign.private_bytes(
-       encoding=Encoding.PEM,
-       format=PrivateFormat.PKCS8,
-       encryption_algorithm=BestAvailableEncryption(passphrase)
+        encoding=Encoding.PEM,
+        format=PrivateFormat.PKCS8,
+        encryption_algorithm=BestAvailableEncryption(passphrase)
     )
     f.write(pem)
     f.close()
 
     f = open(to + ".recv.privkey", "wb")
     pem = privkey_recv.private_bytes(
-       encoding=Encoding.PEM,
-       format=PrivateFormat.PKCS8,
-       encryption_algorithm=BestAvailableEncryption(passphrase)
+        encoding=Encoding.PEM,
+        format=PrivateFormat.PKCS8,
+        encryption_algorithm=BestAvailableEncryption(passphrase)
     )
     f.write(pem)
     f.close()
+
 
 def loadPrivateKey(to, type, passphrase="-"):
     passphrase = passphrase.encode("utf-8")
@@ -439,7 +457,8 @@ def loadPrivateKey(to, type, passphrase="-"):
     f.close()
 
     return load_pem_private_key(pem, password=passphrase, backend=default_backend())
-    
+
+
 def _readFormat(format):
     data = {}
     i = 0
@@ -454,8 +473,8 @@ def _readFormat(format):
                 i += 1
             # Decrement once more at last. So that the end line is counted normally too
             i -= 1
-        
+
         data[key.strip()] = value.strip()
         i += 1
-    
+
     return data
