@@ -464,7 +464,7 @@ def _readFormat(format):
     i = 0
     while i < len(format):
         line = format[i]
-        key, value = line.split(": ")
+        key, value = line.split(": ", 1)
         if value == "|":
             value = ""
             i += 1

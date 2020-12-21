@@ -4,10 +4,10 @@
 
 <form action="" method="POST">
     <label for="to">Empfänger:</label>
-    <input id="to" name="to" placeholder="Kennung@Adresse">
+    <input id="to" name="to" placeholder="Kennung@Adresse" value="{{ request.values.get('reply_to', '') }}">
 
     <label for="subject">Betreff:</label>
-    <input id="subject" name="subject" placeholder="">
+    <input id="subject" name="subject" placeholder="" value="{{ request.values.get('subject', '') }}">
 
     <label for="body">Nachricht:</label>
     <textarea id="body" name="body"></textarea>
