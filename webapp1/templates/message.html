@@ -1,0 +1,6 @@
+{% extends "layout.html" %}
+{% block body %}
+<h1>{{ m.Subject }}</h1>
+<div class="subtitle">von {{ m.Author }}</div>
+<div class="message">{{ m.Body.decode("utf-8") }}</div>
+{% endblock %}

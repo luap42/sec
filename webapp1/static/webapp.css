@@ -113,3 +113,14 @@ form button[type="submit"] {
 form button[type="submit"]:active {
     border-color: #006;
 }
+
+.subtitle {
+    color: #666;
+    margin-top: -1rem;
+    margin-bottom: 1rem;
+}
+.message {
+    font-family:'Courier New', Courier, monospace;
+    white-space: pre-wrap;
+    line-height: 2;
+}

@@ -17,8 +17,28 @@ def index():
 
 @ui.route("/inbox")
 def inbox():
-    return render_template("inbox.html")
+    f = open("storage/users/" + session["user"] + "/inbox", "r")
+    inbox = f.readlines()
+    f.close()
+    inbox = [(k[:36], k[37:]) for k in inbox[::-1]]
+    return render_template("inbox.html", inbox=inbox)
 
+@ui.route("/m/<id>")
+def message(id):
+    user_privkey_recv = sec.loadPrivateKey(
+        "storage/users/" + session["user"] + "/cert/user", "recv", passphrase=session["password"])
+    m = sec.MessageLoader.load("storage/messages/" + id)
+    m = m.decrypt(user_privkey_recv)
+    f = open("storage/users/" + session["user"] + "/inbox", "r+")
+    inbox = f.readlines()
+    inbox = [(k[:36], k[37:]) for k in inbox if len(k)]
+    inbox = [(k[0], m.Subject) if k[0] == id else k for k in inbox]
+    inbox = [k[0] + " " + k[1] for k in inbox]
+    inbox = "\n".join(inbox) + "\n"
+    f.seek(0)
+    f.write(inbox)
+    f.close()
+    return render_template("message.html", id=id, m=m)
 
 @ui.route("/write")
 def write():
