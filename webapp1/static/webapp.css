@@ -45,6 +45,7 @@ nav ._container {
     align-items: center;
     flex-wrap: wrap;
 }
+nav ._container ._flex-grow { flex-grow: 1; }
 nav a {
     color: white;
     font-weight: bold;

@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block body %}
+<h1>Anmelden</h1>
+<a href="{{ url_for('ui.register') }}">Noch kein Konto?</a>
+{% if error %}
+<p><strong>Fehler:</strong> {{ error }}</p>
+{% endif %}
+<form action="" method="POST">
+    <label for="handle">Kennung:</label>
+    <input id="handle" name="handle">
+
+    <label for="password">Passwort:</label>
+    <input id="password" name="password" type="password">
+
+    <button type="submit">Anmelden</button>
+</form>
+{% endblock %}
