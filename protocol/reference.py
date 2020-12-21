@@ -4,10 +4,13 @@
     Reference Implementation.
 """
 
+import os
+
 from datetime import datetime
 from base64 import b64encode, b64decode
 from more_itertools import sliced
 
+from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives.serialization import PublicFormat, PrivateFormat
 from cryptography.hazmat.primitives.serialization import Encoding, BestAvailableEncryption, load_pem_private_key
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
@@ -244,7 +247,97 @@ class CertFile:
 
 
 class Message:
-    pass
+    
+    def __init__(self, Subject,
+                       DataType,
+                       Body,
+                       Author,
+                       Recipient,
+                       MessageDate,
+                       Signature = ""):
+        """
+            
+        """
+        self.Subject        = Subject
+        self.DataType       = DataType
+        self.Body           = Body
+        self.Author         = Author
+        self.Recipient      = Recipient
+        self.MessageDate    = MessageDate
+        self.Signature      = Signature
+
+    def encrypt(self, recipient_cert):
+        """
+            Message.encrypt encrypts the message as specified in the
+            SECTP standard and returns a :_MessageWrapper: object.
+        """
+
+        body = b64encode(self.Body.encode("utf-8")).decode("utf-8")
+        body = "\n".join(sliced(body, 42))
+
+        inner_template = \
+f"""
+Subject: {self.Subject}
+DataType: {self.DataType}
+Body: |
+{body}
+""".strip()
+
+        key = Fernet.generate_key()
+        f = Fernet(key)
+        ct = f.encrypt(inner_template.encode("utf-8"))
+
+        return _MessageWrapper(ct, key, self, recipient_cert)
+
+
+class _MessageWrapper:
+    
+    def __init__(self, cryptotext, full_key, message, recipient_cert):
+        self.cryptotext = cryptotext
+        self.full_key = full_key
+        self.message = message
+        self.recipient_cert = recipient_cert
+
+    def build(self):
+        private_key = self.recipient_cert.PubkeyRecv.encrypt(
+            self.full_key,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None
+            )
+        )
+
+        key = b64encode(private_key).decode("utf-8")
+
+        message = b64encode(self.cryptotext).decode("utf-8")
+        message = "\n".join(sliced(message, 42))
+        
+        return \
+f"""
++++SECTP.1/Message+++
+Author: {self.message.Author.Handle}
+Key: {key}
+Message: |
+{message}
+MessageDate: {self.message.MessageDate}
+""".strip()
+
+    def build_signed(self, privkey_sign):
+        message = self.build()
+        signature = privkey_sign.sign(
+            message.encode("utf-8"),
+            padding.PSS(
+                mgf=padding.MGF1(hashes.SHA256()),
+                salt_length=padding.PSS.MAX_LENGTH
+            ),
+            hashes.SHA256()
+        )
+        signature = b64encode(signature).decode("utf-8")
+        
+        signature_line = "***signed: " + signature + " at " + str(datetime.now())
+
+        return message + "\n" + signature_line
 
 
 def _generateKeys(length):

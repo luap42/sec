@@ -1,4 +1,5 @@
 from protocol.reference import *
+from datetime import datetime
 
 def task1():
     cert, privkey_sign, privkey_recv = Certificate.newService("Omega", "omega.localhost:5000")
@@ -36,11 +37,25 @@ def task4():
     
     print(ucf.verify(cert))
 
-print("\n\nTask 1:\n---")
-task1()
-print("\n\nTask 2:\n---")
-task2()
-print("\n\nTask 3:\n---")
-task3()
-print("\n\nTask 4:\n---")
-task4()
+def task5():
+    cf = CertFile.load("data/luap42.certfile")
+    rcf = CertFile.load("data/codidact.certfile")
+    privkey_sign = loadPrivateKey("data/luap42", "sign")
+
+    cf, rcf = cf.cert(), rcf.cert()
+
+    m = Message("Hello World!", "text/raw", "Hello World! This is a message", cf, rcf, datetime.now())
+    mw = m.encrypt(rcf)
+    print(mw.build_signed(privkey_sign))
+
+if False:
+    print("\n\nTask 1:\n---")
+    task1()
+    print("\n\nTask 2:\n---")
+    task2()
+    print("\n\nTask 3:\n---")
+    task3()
+    print("\n\nTask 4:\n---")
+    task4()
+print("\n\nTask 5:\n---")
+task5()
