@@ -30,13 +30,18 @@ def message(id):
         "storage/users/" + session["user"] + "/cert/user", "recv", passphrase=session["password"])
     m = sec.MessageLoader.load("storage/messages/" + id)
     m = m.decrypt(user_privkey_recv)
-    f = open("storage/users/" + session["user"] + "/inbox", "r+")
+    f = open("storage/users/" + session["user"] + "/inbox", "r")
     inbox = f.readlines()
-    inbox = [(k[:36], k[37:]) for k in inbox if len(k)]
+    f.close()
+    inbox = [(k[:36], k[37:].strip()) for k in inbox if len(k)]
+    print("##################", inbox)
     inbox = [(k[0], m.Subject) if k[0] == id else k for k in inbox]
-    inbox = [k[0] + " " + k[1] for k in inbox]
+    print("******************", inbox)
+    inbox = [(k[0] + " " + k[1]).strip() for k in inbox]
     inbox = "\n".join(inbox) + "\n"
-    f.seek(0)
+    while "\n\n" in inbox:
+        inbox = inbox.replace("\n\n", "\n")
+    f = open("storage/users/" + session["user"] + "/inbox", "w")
     f.write(inbox)
     f.close()
     return render_template("message.html", id=id, m=m)
@@ -56,10 +61,13 @@ def write_do():
         "storage/users/" + session['user'] + "/cert/user.certfile")
     user_cert = user_cert.cert()
 
-    with urllib.request.urlopen("http://" + to_server + "/api/user/" + to_handle + "/certfile") as cf:
-        cfc = cf.read().decode("utf-8")
-    recipient_cert = sec.CertFile.parse(cfc)
-    recipient_cert = recipient_cert.cert()
+    try:
+        with urllib.request.urlopen("http://" + to_server + "/api/user/" + to_handle + "/certfile") as cf:
+            cfc = cf.read().decode("utf-8")
+        recipient_cert = sec.CertFile.parse(cfc)
+        recipient_cert = recipient_cert.cert()
+    except:
+        return render_template("write_done.html", code="ERROR", comment="Verschlüsselungszertifikat nicht erreichbar")
 
     user_privkey_sign = sec.loadPrivateKey(
         "storage/users/" + session["user"] + "/cert/user", "sign", passphrase=session["password"])
@@ -79,7 +87,8 @@ def write_do():
     except:
         response = "ERROR\nServer-Fehler"
 
-    return render_template("write_done.html", response=response)
+    code, comment = response.split("\n")
+    return render_template("write_done.html", code=code, comment=comment)
 
 
 @ui.route("/login", methods=["GET", "POST"])

@@ -1,7 +1,12 @@
 {% extends "layout.html" %}
 {% block body %}
+{% if code == "OK" %}
 <h1>Erfolg!</h1>
 <p>Die Nachricht wurde erfolgreich abgesendet.</p>
+{% else %}
+<h1>Uups.</h1>
+<p>Die Nachricht wurde offenbar nicht angenommen.</p>
 <p>Der Server meldet:</p>
-<pre><code>{{ response }}</code></pre>
+<pre><code><strong>{{ code }}:</strong> {{ comment }}</code></pre>
+{% endif %}
 {% endblock %}
