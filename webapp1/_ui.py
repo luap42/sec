@@ -23,6 +23,7 @@ def inbox():
     inbox = [(k[:36], k[37:]) for k in inbox[::-1]]
     return render_template("inbox.html", inbox=inbox)
 
+
 @ui.route("/m/<id>")
 def message(id):
     user_privkey_recv = sec.loadPrivateKey(
@@ -39,6 +40,7 @@ def message(id):
     f.write(inbox)
     f.close()
     return render_template("message.html", id=id, m=m)
+
 
 @ui.route("/write")
 def write():
