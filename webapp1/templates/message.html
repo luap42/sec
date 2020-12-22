@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block body %}
 <h1>{{ m.Subject }}</h1>
-<div class="subtitle">von {{ m.Author }}, {{ m.MessageDate.strftime("%d.%m.%Y %H:%M                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ") }}, <a href="{{ url_for('ui.write', subject='Re: ' + m.Subject, reply_to=m.Author) }}">Antworten</a></div>
+<div class="subtitle">von {{ m.Author }}, {{ m.MessageDate.strftime("%d.%m.%Y %H:%M") }}, <a href="{{ url_for('ui.write', subject='Re: ' + m.Subject, reply_to=m.Author) }}">Antworten</a></div>
 {% if m.DataType == "text/raw" %}
 <div class="message">{{ m.Body.decode("utf-8") }}</div>
 {% elif m.DataType == "text/html" %}

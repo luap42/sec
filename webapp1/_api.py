@@ -2,7 +2,7 @@ from flask import *
 import protocol.reference as sec
 import sys
 import os
-import uuid
+import uuid, urllib
 sys.path.append("..")
 
 
@@ -44,8 +44,23 @@ def user_recv(handle):
         if handle.isidentifier():
             if os.path.isdir(os.path.abspath("./storage/users/" + handle + "/")):
                 message_id = str(uuid.uuid4())
+                message = request.get_data().decode("utf-8")
+
+                m = sec.MessageLoader.parse(message)
+                from_server, from_handle = m.get_origin_untrusted()
+                try:
+                    with urllib.request.urlopen("http://" + from_server + "/api/user/" + from_handle + "/certfile") as oc:
+                        origin_cert = oc.read().decode("utf-8")
+                    origin_cert = sec.CertFile.parse(origin_cert)
+                    origin_cert = origin_cert.cert()
+                except SyntaxError:
+                    return "REJECTED\nOrigin verification not possible."
+
+                if not m.verify(origin_cert):
+                    return "REJECTED\nOrigin verification failed."
+
                 f = open("storage/messages/" + message_id, "w")
-                f.write(request.get_data().decode("utf-8"))
+                f.write(message)
                 f.close()
 
                 f = open("storage/users/" + handle + "/inbox", "a")
@@ -55,6 +70,6 @@ def user_recv(handle):
             else:
                 return "REJECTED\nUser doesn't exist"
         else:
-                return "REJECTED\nUser Handle is invalid"
+            return "REJECTED\nUser Handle is invalid"
     except Exception as e:
         return "ERROR\n" + str(e)

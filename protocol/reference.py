@@ -345,6 +345,9 @@ class MessageLoader:
     def author_untrusted(self):
         return self._msgdata["Author"]
 
+    def get_origin_untrusted(self):
+        return self.author_untrusted().split("@")[::-1]
+
     def verify(self, cert):
         if self.author_untrusted() != cert.Handle:
             return False
