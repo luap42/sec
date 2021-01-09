@@ -190,3 +190,11 @@ a:hover {
     color: #666;
     margin-right: 1rem;
 }
+
+#pdf_view {
+    height: 60vh;
+    min-height: 500px;
+    border: 2px solid #ccc;
+    margin-top: 1rem;
+    box-shadow: 5px 5px 0 rgba(0,0,0,0.1);
+}

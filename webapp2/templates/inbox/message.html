@@ -1,5 +1,7 @@
 {% extends "layout/application.html" %}
 {% block body %}
+<script src="{{ url_for('static', filename='pdfobject/pdfobject.min.js') }}"></script>
+
 <a href="" class="button is-right-btn">Antworten</a>
 <a href="" class="button secondary is-right-btn">Löschen</a>
 <h1>{{ message.Subject }}</h1>
@@ -14,4 +16,8 @@
         {{ mobj.author.full_handle }}
     </div>
 </div>
+
+<div id="pdf_view"></div>
+
+<script>PDFObject.embed("{{ url_for('inbox.message_pdf', id=mobj.id) }}", "#pdf_view");</script>
 {% endblock %}
