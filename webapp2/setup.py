@@ -9,10 +9,10 @@ import protocol.reference as sec
 
 
 with app.app_context():
-    db.drop_all()
+    # db.drop_all()
     db.create_all()
 
-cert, privkey_sign, privkey_recv = sec.Certificate.newService(
-    SETTINGS['SERVICE_NAME'], SETTINGS['SERVER_URL'])
-sec.storeCert(cert, privkey_sign, privkey_recv, to=os.path.dirname(__file__) + "/cert/server_cert",
-              passphrase=SETTINGS['CERTIFICATE_ENCRYPTION'])
+# cert, privkey_sign, privkey_recv = sec.Certificate.newService(
+#     SETTINGS['SERVICE_NAME'], SETTINGS['SERVER_URL'])
+# sec.storeCert(cert, privkey_sign, privkey_recv, to=os.path.dirname(__file__) + "/cert/server_cert",
+#               passphrase=SETTINGS['CERTIFICATE_ENCRYPTION'])

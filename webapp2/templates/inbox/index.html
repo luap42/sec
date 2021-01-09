@@ -6,6 +6,7 @@
 <div class="folders">
     <a href="{{ url_for('inbox.index') }}" class="current">Posteingang</a>
     <a href="{{ url_for('inbox.sent') }}">Gesendete Nachrichten</a>
+    <a href="{{ url_for('inbox.deleted') }}">Gelöschte Nachrichten</a>
 </div>
 
 {% include "inbox/_list.html" %}

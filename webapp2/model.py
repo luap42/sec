@@ -27,3 +27,26 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.username
+
+
+class Message(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    postbox = db.Column(db.String(30), nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey(
+        'certificate.id'), nullable=False)
+    author = db.relationship('Certificate',
+                             backref='message', lazy=True)
+
+    owner_id = db.Column(db.Integer, db.ForeignKey(
+        'user.id'), nullable=False)
+    owner = db.relationship('User', backref='message', lazy=True)
+
+    message_body = db.Column(db.Text, nullable=False)
+    subject = db.Column(db.String(255))
+
+    is_seen = db.Column(db.Boolean, nullable=False)
+    is_opened = db.Column(db.Boolean, nullable=False)
+    is_read = db.Column(db.Boolean, nullable=False)
+
+    def __repr__(self):
+        return '<Certificate %r>' % self.full_handle
