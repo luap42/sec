@@ -11,13 +11,15 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
 from .views.auth import auth
+from .views.inbox import inbox
 
 app.register_blueprint(auth, url_prefix="/auth")
+app.register_blueprint(inbox, url_prefix="/inbox")
 
 
 @app.route("/")
 def index():
-    if "user_id" not in session.keys():
+    if not session.get('in', False):
         return redirect(url_for('auth.signin'))
     else:
-        return redirect(url_for('auth.signup'))
+        return redirect(url_for('inbox.index'))

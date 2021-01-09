@@ -1,0 +1,12 @@
+{% extends "layout/application.html" %}
+{% block body %}
+<a href="" class="button is-right-btn">Aktualisieren</a>
+<a href="" class="button secondary is-right-btn">Nachricht verfassen</a>
+<h1>Posteingang</h1>
+<div class="folders">
+    <a href="{{ url_for('inbox.index') }}" class="current">Posteingang</a>
+    <a href="{{ url_for('inbox.sent') }}">Gesendete Nachrichten</a>
+</div>
+
+{% include "inbox/_list.html" %}
+{% endblock %}
