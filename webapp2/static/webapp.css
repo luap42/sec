@@ -1,8 +1,99 @@
 * { box-sizing: border-box; }
 html {
     font-family: Arial, Helvetica, sans-serif;
+    background-color: #333;
 }
 html, body {
     margin: 0;
     padding: 0;
+}
+
+header {
+    padding: 1rem;
+    background-color: #000;
+    box-shadow: 5px 5px 0 rgba(0,0,0,0.2);
+}
+header .brand {
+    color: white;
+    font-size: 1.5rem;
+    text-decoration: none;
+}
+.container, main {
+    width: 100%;
+    max-width: 1024px;
+    margin: 0 auto;
+}
+
+main {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 0.15rem;
+    box-shadow: 10px 10px 0 rgba(0,0,0,0.3);
+}
+
+.splash main {
+    max-width: 512px;
+    margin-top: 3rem;
+}
+
+h1 {
+    margin: 0;
+    margin-bottom: 1.5rem;
+    font-size: 2.5rem;
+}
+
+input, textarea {
+    background-color: #eee;
+    border: none;
+    width: 100%;
+    display: block;
+    padding: 0.5rem;
+    font: inherit;
+    box-shadow: 2.5px 2.5px 0 rgba(0,0,0,0.2);
+    margin-top: 0.125rem;
+    margin-bottom: 1.5rem;
+    border-radius: 0.15rem;
+}
+textarea {
+    resize: vertical;
+    min-height: 5rem;
+}
+label {
+    cursor: pointer;
+    font-weight: bold;
+    display: block;
+}
+
+.button {
+    cursor: pointer;
+    background-color: #06e;
+    color: white;
+    border: none;
+    width: fit-content;
+    display: block;
+    padding: 0.5rem 1rem;
+    font: inherit;
+    font-weight: bold;
+    box-shadow: 2.5px 2.5px 0 rgba(0,51,119,0.2);
+    margin: 0.125rem 0;
+    border-radius: 0.15rem;
+
+    position: relative;
+    transition: all .3s ease;
+}
+.button:hover {
+    background-color: #04c;
+}
+.button:active {
+    background-color: #04c;
+    top: 2.5px;
+    left: 2.5px;
+    box-shadow: none;
+}
+
+a {
+    color: #06e;
+}
+a:hover {
+    color: #04c;
 }

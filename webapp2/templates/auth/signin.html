@@ -1,1 +1,13 @@
 {% extends "layout/splash.html" %}
+{% block body %}
+<h1>Anmeldung</h1>
+<p>Noch kein Benutzerkonto? <a href="">Jetzt registrieren!</a></p>
+<form action="" method="post">
+    <label for="username">Benutzername</label>
+    <input id="username" class="username">
+    <label for="password">Passwort</label>
+    <input id="password" class="password" type="password">
+
+    <button type="submit" class="button">Anmelden</button>
+</form>
+{% endblock %}
