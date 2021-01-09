@@ -1,3 +1,5 @@
 data/*
 protocol/__pycache__
 webapp1/storage/*
+webapp1/__pycache__/*
+webapp2/__pycache__/*
