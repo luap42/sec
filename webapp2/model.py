@@ -47,6 +47,7 @@ class Message(db.Model):
     is_seen = db.Column(db.Boolean, nullable=False)
     is_opened = db.Column(db.Boolean, nullable=False)
     is_read = db.Column(db.Boolean, nullable=False)
+    sent_date = db.Column(db.DateTime, nullable=False)
 
     def __repr__(self):
         return '<Certificate %r>' % self.full_handle

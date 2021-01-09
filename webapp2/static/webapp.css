@@ -18,7 +18,7 @@ header .brand {
     font-size: 1.5rem;
     text-decoration: none;
 }
-header .brand:hover { color: white; }
+header .brand:hover { color: white; text-decoration: none; }
 .container, main {
     width: 100%;
     max-width: 1024px;
@@ -68,9 +68,11 @@ label {
 
 a {
     color: #06e;
+    text-decoration: none;
 }
 a:hover {
     color: #04c;
+    text-decoration: underline;
 }
 
 .button {
@@ -92,6 +94,7 @@ a:hover {
 }
 .button:hover {
     background-color: #04c;
+    text-decoration: none;
 }
 .button:active {
     background-color: #04c;

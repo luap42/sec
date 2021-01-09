@@ -8,6 +8,13 @@ from .. import sec
 auth = Blueprint('auth', __name__)
 
 
+@auth.route("/signoff")
+def signoff():
+    session["in"] = False
+    del session["password"]
+    del session["user_id"]
+    return redirect(url_for('index'))
+
 @auth.route("/signin", methods=["GET", "POST"])
 def signin():
     errors = []

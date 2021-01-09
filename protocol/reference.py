@@ -348,6 +348,9 @@ class MessageLoader:
     def get_origin_untrusted(self):
         return self.author_untrusted().split("@")[::-1]
 
+    def date_untrusted(self):
+        return self._msgdata['MessageDate']
+
     def verify(self, cert):
         if self.author_untrusted() != cert.Handle:
             return False

@@ -52,4 +52,9 @@ SETTINGS = {
     'CERTIFICATE_ENCRYPTION': 'sec.webapp2.cert-key',
     #
     # #########################################################################
+
+    'trustlist': [
+        'localhost:5000',
+        'localhost:5001',
+    ]
 }
