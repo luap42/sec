@@ -33,4 +33,23 @@ SETTINGS = {
     'SESSION_SECRET_KEY': 'sec.webapp2.key',
     #
     # #########################################################################
+    #
+    # SERVICE_NAME
+    # ------------
+    # This setting contains the publicly available name under which this server is
+    # known and referred to. This should be fairly unique in the internet and human-
+    # readable.
+    #
+    'SERVICE_NAME': 'SEC Webapp2',
+    #
+    # #########################################################################
+    #
+    # CERTIFICATE_ENCRYPTION
+    # ----------------------
+    # This setting contains the secret key, which webapp2 will use to secure the
+    # private keys for signature and receiving messages for this service.
+    #
+    'CERTIFICATE_ENCRYPTION': 'sec.webapp2.cert-key',
+    #
+    # #########################################################################
 }
