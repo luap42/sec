@@ -1,7 +1,4 @@
-import sys
-sys.path.append("..")
-
-import protocol.reference as sec
+from . import sec
 
 name = input("Service Name: ")
 URL = input("Service URL: ")

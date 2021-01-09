@@ -7,14 +7,8 @@ class Certificate(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     full_handle = db.Column(db.String(255), unique=True, nullable=False)
-    public_recv_key = db.Column(db.Text, nullable=False)
-    public_sign_key = db.Column(db.Text, nullable=False)
-    flags = db.Column(db.Text, nullable=False)
+    certfile_body = db.Column(db.Text)
     is_validated = db.Column(db.Boolean, nullable=False)
-    authorized_by = db.Column(db.String(255), nullable=False)
-    authorized_signature = db.Column(db.String(255), nullable=False)
-    local_user = db.relationship(
-        'User', backref=db.backref('certificate', uselist=False), lazy=True)
 
     def __repr__(self):
         return '<Certificate %r>' % self.full_handle
@@ -28,6 +22,8 @@ class User(db.Model):
     private_sign_key = db.Column(db.Text, nullable=False)
     certificate_id = db.Column(db.Integer, db.ForeignKey(
         'certificate.id'), nullable=False)
+    certificate = db.relationship('Certificate',
+                                  backref='user', lazy=True)
 
     def __repr__(self):
         return '<User %r>' % self.username
