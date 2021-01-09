@@ -35,3 +35,18 @@ def deleted():
     messages = Message.query.filter_by(owner=request.user, postbox='deleted_inbox').all() + \
         Message.query.filter_by(owner=request.user, postbox='deleted_sent').all()
     return render_template("inbox/deleted.html", messages=messages)
+
+@inbox.route("/<id>")
+def message(id):
+    m = Message.query.filter_by(owner=request.user, id=id).first_or_404()
+    user_privkey_recv = sec.inputPrivateKey(request.user.private_recv_key.encode("utf-8"), session['password'])
+    message_file = m.message_body
+
+    message = sec.MessageLoader.parse(message_file)
+    message = message.decrypt(user_privkey_recv)
+
+    m.is_seen = m.is_opened = m.is_read = True
+    m.subject = message.Subject
+    db.session.add(m)
+    db.session.commit()
+    return render_template("inbox/message.html", id=id, message=message, mobj = m)

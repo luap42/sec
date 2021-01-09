@@ -1,0 +1,17 @@
+{% extends "layout/application.html" %}
+{% block body %}
+<a href="" class="button is-right-btn">Antworten</a>
+<a href="" class="button secondary is-right-btn">Löschen</a>
+<h1>{{ message.Subject }}</h1>
+<div class="meta">
+    <div class="meta--field">
+        {{ mobj.sent_date }}
+    </div>
+    <div class="meta--field">
+        {{ mobj.author.name }}
+    </div>
+    <div class="meta--field">
+        {{ mobj.author.full_handle }}
+    </div>
+</div>
+{% endblock %}

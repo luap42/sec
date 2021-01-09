@@ -2,13 +2,13 @@
     {% for message in messages %}
     <div class="message">
         {% if message.is_opened %}
-        <h3><a href="">{{ message.subject }}</a></h3>
+        <h3><a href="{{ url_for('inbox.message', id=message.id) }}">{{ message.subject }}</a></h3>
         {% else %}
-        <h3>🔒 <a href="">Noch nicht geöffnet</a></h3>
+        <h3 class="unopened">🔒 <a href="{{ url_for('inbox.message', id=message.id) }}">Noch nicht geöffnet</a></h3>
         {% endif %}
         <div class="meta">
             <div class="meta--field">
-                2021-01-09 21:29
+                {{ message.sent_date }}
             </div>
             <div class="meta--field">
                 {{ message.author.name }}

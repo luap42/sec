@@ -473,6 +473,10 @@ def loadPrivateKey(to, type, passphrase="-"):
 
     return load_pem_private_key(pem, password=passphrase, backend=default_backend())
 
+def inputPrivateKey(pem, passphrase="-"):
+    passphrase = passphrase.encode("utf-8")
+    return load_pem_private_key(pem, password=passphrase, backend=default_backend())
+
 
 def _readFormat(format):
     data = {}
