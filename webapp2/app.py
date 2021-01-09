@@ -4,6 +4,8 @@ from .config import SETTINGS
 from .model import db
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = SETTINGS['SESSION_SECRET_KEY']
+
 app.config['SQLALCHEMY_DATABASE_URI'] = SETTINGS['DATABASE_URL']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
@@ -15,4 +17,7 @@ app.register_blueprint(auth, url_prefix="/auth")
 
 @app.route("/")
 def index():
-    return redirect(url_for('auth.signin'))
+    if "user_id" not in session.keys():
+        return redirect(url_for('auth.signin'))
+    else:
+        return redirect(url_for('auth.signup'))

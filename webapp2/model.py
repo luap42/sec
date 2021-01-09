@@ -23,7 +23,7 @@ class Certificate(db.Model):
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(75), unique=True, nullable=False)
-    password_hash = db.Column(db.String(255), nullable=False)
+    password_hash = db.Column(db.LargeBinary, nullable=False)
     private_recv_key = db.Column(db.Text, nullable=False)
     private_sign_key = db.Column(db.Text, nullable=False)
     certificate_id = db.Column(db.Integer, db.ForeignKey(

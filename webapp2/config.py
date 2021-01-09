@@ -16,11 +16,21 @@ SETTINGS = {
     # #########################################################################
     #
     # SERVER_URL
-    # ------------
+    # ----------
     # This setting contains the URL under which the webapp2 application will be
     # p u b l i c l y  available under, without any "https://" in front of it.
     #
-    'SERVER_URL': 'localhost:5000'
+    'SERVER_URL': 'localhost:5000',
+    #
+    # #########################################################################
+    #
+    # SESSION_SECRET_KEY
+    # ------------------
+    # This setting contains the secret key, which Flask will use to provide
+    # user sessions (signing in). Change this to a random value and do not give
+    # it to other people or they will be able to forge user sessions.
+    #
+    'SESSION_SECRET_KEY': 'sec.webapp2.key',
     #
     # #########################################################################
 }

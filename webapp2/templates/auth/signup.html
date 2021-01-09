@@ -1,14 +1,16 @@
 {% extends "layout/splash.html" %}
 {% block body %}
-<h1>Anmeldung</h1>
-<p>Noch kein Benutzerkonto? <a href="{{ url_for('auth.signup') }}">Jetzt registrieren!</a></p>
+<h1>Registrierung</h1>
+<p>Schon ein Benutzerkonto? <a href="{{ url_for('auth.signin') }}">Jetzt anmelden!</a></p>
 <form action="" method="post">
+    <label for="full_name">Name (öffentlich)</label>
+    <input id="full_name" name="full_name">
     <label for="username">Benutzername</label>
     <input id="username" name="username">
     <label for="password">Passwort</label>
     <input id="password" name="password" type="password">
     
-    <button type="submit" class="button">Anmelden</button>
+    <button type="submit" class="button">Registrieren</button>
 </form>
 {% for error in errors %}
 <p class="error">{{ error }}</p>
