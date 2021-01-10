@@ -83,6 +83,7 @@ def _create_user(name, handle, pw, pw_hash):
     u.password_hash = pw_hash
     u.private_sign_key = privkey_sign
     u.private_recv_key = privkey_recv
+    u.is_admin = False
 
     u.certificate = c
 
