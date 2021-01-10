@@ -39,11 +39,13 @@ def it():
     to, subject, content_type = request.form['recipient'], request.form['subject'], request.form['content-type']
 
     if content_type == 'text/raw':
-        body = request.form['body_raw']
+        body = request.form['body_raw'].encode('utf-8')
     elif content_type == 'text/html':
-        body = request.form['body_html']
+        body = request.form['body_html'].encode('utf-8')
+    elif content_type == 'application/pdf':
+        body = request.files['body_pdf'].read()
     else:
-        body = request.form['body']
+        body = request.form['body'].encode('utf-8')
 
     c = Certificate.query.filter_by(full_handle=to).first()
     own_cert = sec.CertFile.parse(
@@ -92,7 +94,7 @@ def it():
 
     recipient_cert = sec.CertFile.parse(c.certfile_body).cert()
 
-    origm = sec.Message(subject, content_type, body.encode("utf-8"),
+    origm = sec.Message(subject, content_type, body,
                         own_cert, recipient_cert, datetime.now())
     m = origm.encrypt(recipient_cert)
     m_code = m.build_signed(user_privkey_sign)

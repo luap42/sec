@@ -115,7 +115,7 @@ def user_recv(handle):
             m.postbox = 'inbox'
             m.author = author
             m.owner = u
-            m.message_body = message
+            m.message_body = message.encode('utf-8')
             m.subject = ''
             m.is_seen = m.is_opened = m.is_read = False
             m.sent_date = message_date

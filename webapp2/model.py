@@ -43,7 +43,7 @@ class Message(db.Model):
         'user.id'), nullable=False)
     owner = db.relationship('User', backref='message', lazy=True)
 
-    message_body = db.Column(db.Text, nullable=False)
+    message_body = db.Column(db.TEXT(10000000), nullable=False)
     subject = db.Column(db.String(255))
 
     is_seen = db.Column(db.Boolean, nullable=False)

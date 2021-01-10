@@ -31,6 +31,11 @@
         <input type="hidden" name="body_html" id="body_html-input">
     </div>
 
+    <div class="doctype--partial is-pdf">
+        <p>Wähle die PDF-Datei aus:</p>
+        <input type="file" name="body_pdf" accept="pdf">
+    </div>
+
 
     <script>
         var quill = new Quill('#body_html', {
@@ -71,12 +76,17 @@
             if(document.querySelector('.doctype--partial.is-active'))
                 document.querySelector('.doctype--partial.is-active').classList.remove('is-active');
 
-            if(mime == "text/raw")
+            form = document.querySelector('form');
+            form.removeAttribute('enctype');
+
+            if(mime == "text/raw") {
                 document.querySelector('.doctype--partial.is-raw').classList.add('is-active');
-            else if (mime == "text/html")
+            } else if (mime == "text/html") {
                 document.querySelector('.doctype--partial.is-html').classList.add('is-active');
-            else if (mime == "application/pdf")
+            } else if (mime == "application/pdf") {
                 document.querySelector('.doctype--partial.is-pdf').classList.add('is-active');
+            form.setAttribute('enctype', 'multipart/form-data');
+            }
         }
     </script>
 </form>
