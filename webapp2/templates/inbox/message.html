@@ -1,23 +1,30 @@
 {% extends "layout/application.html" %}
 {% block body %}
-<script src="{{ url_for('static', filename='pdfobject/pdfobject.min.js') }}"></script>
-
+<a href="{{ url_for('inbox.index') }}" class="nav-btn">&laquo; Zurück zum Posteingang</a>
 <a href="" class="button is-right-btn">Antworten</a>
-<a href="" class="button secondary is-right-btn">Löschen</a>
+<a href="{{ url_for('inbox.tds', id=mobj.id) }}" class="button secondary is-right-btn">{% if mobj.postbox in ['inbox', 'sent'] %}Löschen{% else %}Wiederherstellen{% endif %}</a>
 <h1>{{ message.Subject }}</h1>
 <div class="meta">
     <div class="meta--field">
-        {{ mobj.sent_date }}
+        🕒 {{ mobj.sent_date }}
     </div>
     <div class="meta--field">
-        {{ mobj.author.name }}
+        👤 {{ mobj.author.name }}
     </div>
     <div class="meta--field">
         {{ mobj.author.full_handle }}
     </div>
+    <div class="meta--field">
+        📁 {{ {'inbox': 'Posteingang', 'sent': 'Gesendete Nachrichten', 'deleted_inbox': 'Gelöschte Nachrichten', 'deleted_sent': 'Gelöschte Nachrichten'}[mobj.postbox] }}
+    </div>
 </div>
 
+{% if mobj.postbox not in ['inbox', 'sent'] %}
+<div class="error">Die Nachricht wurde gelöscht. Du kannst sie aber wiederherstellen.</div>
+{% else %}
 <div id="pdf_view"></div>
-
-<script>PDFObject.embed("{{ url_for('inbox.message_pdf', id=mobj.id) }}", "#pdf_view");</script>
+<script src="{{ url_for('static', filename='pdfobject/pdfobject.min.js') }}"></script>
+<script>PDFObject.embed("{{ url_for('inbox.message_pdf', id=mobj.id) }}", "#pdf_view",
+                        { forcePDFJS: true, PDFJS_URL: "{{ url_for('static', filename='pdfjs/web/viewer.html') }}"});</script>
+{% endif %}
 {% endblock %}

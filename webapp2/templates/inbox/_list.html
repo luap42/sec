@@ -8,13 +8,16 @@
         {% endif %}
         <div class="meta">
             <div class="meta--field">
-                {{ message.sent_date }}
+                🕒 {{ message.sent_date }}
             </div>
             <div class="meta--field">
-                {{ message.author.name }}
+                👤 {{ message.author.name }}
             </div>
             <div class="meta--field">
                 {{ message.author.full_handle }}
+            </div>
+            <div class="meta--field">
+                📁 {{ {'inbox': 'Posteingang', 'sent': 'Gesendete Nachrichten', 'deleted_inbox': 'Gelöschte Nachrichten', 'deleted_sent': 'Gelöschte Nachrichten'}[message.postbox] }}
             </div>
         </div>
     </div>

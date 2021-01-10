@@ -89,6 +89,26 @@ def message_pdf(id):
     http_response.headers["Content-Type"] = "application/pdf"
     return http_response
 
+@inbox.route("/<id>/tds", methods=["GET", "POST"])
+def tds(id):
+    m = Message.query.filter_by(owner=request.user, id=id).first_or_404()
+
+    if request.method == 'POST':
+        CONVERSIONS = {
+            'inbox': 'deleted_inbox',
+            'deleted_inbox': 'inbox',
+            'sent': 'deleted_sent',
+            'deleted_sent': 'sent',
+        }
+        m.postbox = CONVERSIONS[m.postbox]
+        db.session.add(m)
+        db.session.commit()
+
+        return redirect(url_for('inbox.message', id=id))
+
+    return render_template('inbox/tds.html', m=m)
+        
+
 def safe_decode(txt):
     txt = txt.decode('utf-8').replace('<', '&lt;').replace('>', '&gt;')
     txt = txt.replace('&', '&quot;').replace("\r\n", "\n").replace("\n\r", "\n")
