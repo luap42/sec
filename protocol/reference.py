@@ -161,9 +161,9 @@ class CertFile:
         self._certfile = certfile
         self._signature = signature
 
-    def cert(self, _authorize_cert=None):
+    def cert(self, _authorize_cert=None, _no_verify=False):
         if _authorize_cert is not None:
-            if self.verify(_authorize_cert):
+            if _no_verify or self.verify(_authorize_cert):
                 self._cert.Authorize = _authorize_cert
         else:
             self._cert.Authorize = None
@@ -171,10 +171,12 @@ class CertFile:
         return self._cert
 
     def verify(self, _authorize_cert=None):
+        self.cert(_authorize_cert, _no_verify=True)
+
         if _authorize_cert is None:
             _authorize_cert = self._cert.PubkeySign
         else:
-            if _authorize_cert.Handle != self._cert.Authorize and _authorize_cert.Handle != self._cert.Handle:
+            if _authorize_cert.Handle != self._cert.Authorize.Handle and _authorize_cert.Handle != self._cert.Handle:
                 return False
 
             _authorize_cert = _authorize_cert.PubkeySign
@@ -189,7 +191,7 @@ class CertFile:
                 ),
                 hashes.SHA256()
             )
-        except InvalidSignature:
+        except SyntaxError:#InvalidSignature:
             return False
         else:
             return True

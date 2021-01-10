@@ -2,6 +2,7 @@ from .views.api import api
 from .views.send import send
 from .views.inbox import inbox
 from .views.auth import auth
+from .views.contact import contact
 from flask import *
 
 from .config import SETTINGS
@@ -19,6 +20,7 @@ app.register_blueprint(auth, url_prefix="/auth")
 app.register_blueprint(inbox, url_prefix="/inbox")
 app.register_blueprint(api, url_prefix="/api")
 app.register_blueprint(send, url_prefix="/send")
+app.register_blueprint(contact, url_prefix="/contact")
 
 
 @app.route("/")

@@ -16,7 +16,7 @@
         👤 {{ mobj.author.name }}
     </div>
     <div class="meta--field">
-        {{ mobj.author.full_handle }}
+        <a href="{{ url_for('contact.user', handle=mobj.author.full_handle) }}">{{ mobj.author.full_handle }}</a>
     </div>
     <div class="meta--field">
         📁 {{ {'inbox': 'Posteingang', 'sent': 'Gesendete Nachrichten', 'deleted_inbox': 'Gelöschte Nachrichten', 'deleted_sent': 'Gelöschte Nachrichten'}[mobj.postbox] }}

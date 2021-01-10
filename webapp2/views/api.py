@@ -69,12 +69,13 @@ def user_recv(handle):
             m = sec.MessageLoader.parse(message)
             from_server, from_handle = m.get_origin_untrusted()
             try:
-                with urllib.request.urlopen("http://" + from_server + "/api/user/" + from_handle + "/certfile") as oc:
+                with urllib.request.urlopen("http://" + from_server + "/api/user/" +
+                                            from_handle + "/certfile") as oc:
                     origin_cert = oc.read().decode("utf-8")
                 original_cert = origin_cert
                 origin_certfile = sec.CertFile.parse(origin_cert)
                 origin_cert = origin_certfile.cert()
-            except SyntaxError:
+            except:
                 return "REJECTED\nOrigin verification not possible."
 
             if not m.verify(origin_cert):
@@ -89,7 +90,7 @@ def user_recv(handle):
                     origin_service_certfile = sec.CertFile.parse(
                         origin_service_cert)
                     origin_service_cert = origin_service_certfile.cert()
-                except SyntaxError:
+                except:
                     return "REJECTED\nOrigin Service verification not possible."
 
                 if not origin_service_certfile.verify():

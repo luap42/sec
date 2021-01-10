@@ -87,8 +87,6 @@ def it():
     except:
         response = "ERROR\nServer-Fehler"
 
-    print('*#'*50)
-    print(response)
     code, comment = response.split("\n", maxsplit=1)
 
     if code == 'OK':
@@ -106,8 +104,5 @@ def it():
         m.sent_date = origm.MessageDate
         db.session.add(m)
         db.session.commit()
-
-        print('*'*50)
-        print(m.id)
 
     return render_template("send/done.html", code=code, comment=comment)

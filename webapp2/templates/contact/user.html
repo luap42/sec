@@ -1,0 +1,58 @@
+{% extends "layout/application.html" %}
+{% block body %}
+<a href="{{ url_for('send.index', reply_to=cert.full_handle) }}" class="button is-right-btn">Anschreiben</a>
+<h1>{{ cert.name }}</h1>
+<div class="meta">
+    <div class="meta--field">
+        👤 {{ cert.full_handle }}
+    </div>
+</div>
+
+<h3>Informationen</h3>
+
+<table>
+    <tr>
+        <th>Name</th>
+        <td>{{ sec_cert.Name }}</td>
+    </tr>
+    <tr>
+        <th>Kennung</th>
+        <td>{{ sec_cert.Handle }}</td>
+    </tr>
+    <tr>
+        <th>Hinweise</th>
+        <td>
+            <ul>
+                {% for flag in sec_cert.Flags %}
+                    {% if flag == 'verified' %}
+                        <li><strong>Verifiziert.</strong> Der Anbieter hat die Identität überprüft.</li>
+                    {% elif flag == 'authority' %}
+                        <li><strong>Autorität.</strong> Laut Anbieter ist dies eine Regierungsbehörde.</li>
+                    {% elif flag == 'readconfirm' %}
+                        <li><strong>Lesebestätigung.</strong> Der Lesestatus wird bei Nachrichten an diese Adresse angezeigt.</li>
+                    {% elif flag == 'temporary' %}
+                        <li><strong>Vorläufig.</strong> Dieses vorläufige Zertifikat ist nur 180 Tage gültig.</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <th>Gültigkeit</th>
+        <td>
+            {% if trust_status == 'local' %}
+                ✅ Das Zertifikat stammt von diesem Anbieter und ist vertrauenswürdig.
+            {% elif trust_status == 'trustworthy_service' %}
+                ✅ Das Zertifikat stammt von einem vertrauenswürdigen Anbieter und ist in Ordnung.
+            {% elif trust_status == 'broken' %}
+                ⚠️ Das Zertifikat ist gefälscht oder kann nicht überprüft werden.
+            {% else %}
+                🔒 Das Zertifikat ist in Ordnung, der Anbieter ist aber nicht vertrauenswürdig.
+            {% endif %}
+        </td>
+    </tr>
+</table>
+
+<h3>Zertifikat</h3>
+<pre class="cert">{{ cert.certfile_body }}</pre>
+{% endblock %}
