@@ -115,6 +115,18 @@ def tds(id):
 
     return render_template('inbox/tds.html', m=m)
 
+@inbox.route("/<id>/ultimdel", methods=["GET", "POST"])
+def ultimdel(id):
+    m = Message.query.filter_by(owner=request.user, id=id).first_or_404()
+
+    if m.postbox in ['deleted_inbox', 'deleted_sent']:
+        db.session.delete(m)
+        db.session.commit()
+
+        return redirect(url_for('inbox.deleted'))
+
+    abort(403)
+
 
 def safe_decode(txt):
     txt = txt.decode('utf-8').replace('<', '&lt;').replace('>', '&gt;')
