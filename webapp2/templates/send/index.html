@@ -1,5 +1,8 @@
 {% extends "layout/application.html" %}
 {% block body %}
+<link rel="stylesheet" href="{{ url_for('static', filename='quill/quill.snow.css') }}"></script>
+<script src="{{ url_for('static', filename='quill/quill.js') }}"></script>
+
 <form action="{{ url_for('send.it') }}" method="POST">
     <button type="submit" class="button is-right-btn">Nachricht absenden</button>
     <a href="{{ url_for('inbox.index') }}" class="button secondary is-right-btn">Abbrechen</a>
@@ -11,7 +14,69 @@
     <label for="subject">Betreff</label>
     <input id="subject" name="subject" value="{{ request.values.get('subject', '') }}">
 
-    <label for="body">Nachricht</label>
-    <textarea id="body" name="body"></textarea>
+    <div class="folders doctype--selection">
+        <a href="javascript:selectDTP('text/raw')" data-dt="text/raw" class="current">Unformattierter Text</a>
+        <a href="javascript:selectDTP('text/html')" data-dt="text/html" >Normaler Text</a>
+        <a href="javascript:selectDTP('application/pdf')" data-dt="application/pdf" >PDF Hochladen</a>
+    </div>
+
+    <input type="hidden" name="content-type" id="content-type" value="text/raw">
+
+    <div class="doctype--partial is-raw is-active">
+        <textarea id="body_raw" name="body_raw"></textarea>
+    </div>
+
+    <div class="doctype--partial is-html">
+        <div id="body_html"></div>
+        <input type="hidden" name="body_html" id="body_html-input">
+    </div>
+
+
+    <script>
+        var quill = new Quill('#body_html', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+                    [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+                    [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+
+                    [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+                    
+                    [{ 'align': [] }],
+
+                    [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+
+                    ['clean']                                         // remove formatting button
+                ]
+            }
+        });
+
+        quill.on('text-change', function(delta, oldDelta, source) {
+            document.getElementById('body_html-input').value = document.querySelector('#body_html .ql-editor').innerHTML
+        })
+
+
+        function selectDTP(mime) {
+            self = document.querySelector('[data-dt="'+mime+'"]');
+            self.parentNode.querySelector('.current').classList.remove('current');
+            self.classList.add('current');
+
+            document.querySelector('#content-type').value = mime;
+
+            if(document.querySelector('.doctype--partial.is-active'))
+                document.querySelector('.doctype--partial.is-active').classList.remove('is-active');
+
+            if(mime == "text/raw")
+                document.querySelector('.doctype--partial.is-raw').classList.add('is-active');
+            else if (mime == "text/html")
+                document.querySelector('.doctype--partial.is-html').classList.add('is-active');
+            else if (mime == "application/pdf")
+                document.querySelector('.doctype--partial.is-pdf').classList.add('is-active');
+        }
+    </script>
 </form>
 {% endblock %}
