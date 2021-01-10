@@ -254,4 +254,5 @@ table th {
     font-size: 16px !important;
     font-family: inherit !important;
     padding: 2rem !important;
+    line-height: 2 !important;
 }

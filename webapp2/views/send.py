@@ -24,7 +24,15 @@ def index():
 
 @send.route("/", methods=["POST"])
 def it():
-    to, subject, body = request.form['recipient'], request.form['subject'], request.form['body']
+    to, subject, content_type = request.form['recipient'], request.form['subject'], request.form['content-type']
+
+    if content_type == 'text/raw':
+        body = request.form['body_raw']
+    elif content_type == 'text/html':
+        body = request.form['body_html']
+    else:
+        body = request.form['body']
+
     c = Certificate.query.filter_by(full_handle=to).first()
     own_cert = sec.CertFile.parse(
         request.user.certificate.certfile_body).cert()
@@ -72,7 +80,7 @@ def it():
 
     recipient_cert = sec.CertFile.parse(c.certfile_body).cert()
 
-    origm = sec.Message(subject, "text/raw", body.encode("utf-8"),
+    origm = sec.Message(subject, content_type, body.encode("utf-8"),
                         own_cert, recipient_cert, datetime.now())
     m = origm.encrypt(recipient_cert)
     m_code = m.build_signed(user_privkey_sign)
