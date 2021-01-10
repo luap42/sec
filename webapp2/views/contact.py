@@ -73,3 +73,47 @@ def user(handle):
         db.session.commit()
 
     return render_template("contact/user.html", cert=cert, sec_cert=sec_cert, trust_status=trust_status)
+
+
+@contact.route("/admin/<id>")
+def admin_page(id):
+    user = User.query.get_or_404(id)
+    certificate = user.certificate
+    certfile = sec.CertFile.parse(certificate.certfile_body)
+    cert = certfile.cert()
+    return render_template("contact/admin_page.html", user=user, cert=cert)
+
+@contact.route("/admin/<id>", methods=["POST"])
+def admin_update(id):
+    user = User.query.get_or_404(id)
+
+    server_cert = sec.CertFile.load("cert/server_cert.certfile")
+    if not server_cert.verify():
+        return {"errors": ["Serverfehler. Ungültiges Service-Zertifikat."]}
+    server_cert = server_cert.cert()
+    server_privkey_sign = sec.loadPrivateKey(
+        "cert/server_cert", "sign",
+        passphrase=SETTINGS['CERTIFICATE_ENCRYPTION'])
+    
+    certificate = user.certificate
+    certfile = sec.CertFile.parse(certificate.certfile_body)
+    cert = certfile.cert(server_cert)
+
+    if 'verified' in cert.Flags:
+        cert.Flags.remove('verified')
+    if 'authority' in cert.Flags:
+        cert.Flags.remove('authority')
+
+    if 'verified' in request.form.keys():
+        cert.Flags.append('verified')
+    if 'authority' in request.form.keys():
+        cert.Flags.append('authority')
+
+    cert_code = cert.build_signed(server_privkey_sign)
+
+    certificate.certfile_body = cert_code
+    db.session.add(certificate)
+    db.session.commit()
+
+
+    return redirect(url_for('contact.user', handle=certificate.full_handle))

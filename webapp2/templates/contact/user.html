@@ -1,6 +1,9 @@
 {% extends "layout/application.html" %}
 {% block body %}
 <a href="{{ url_for('send.index', reply_to=cert.full_handle) }}" class="button is-right-btn">Anschreiben</a>
+{% if request.user.is_admin and cert.user %}
+<a href="{{ url_for('contact.admin_page', id=cert.user[0].id) }}" class="button secondary is-right-btn">Einstellungen</a>
+{% endif %}
 <h1>{{ cert.name }}</h1>
 <div class="meta">
     <div class="meta--field">

@@ -1,0 +1,17 @@
+{% extends "layout/application.html" %}
+{% block body %}
+<h1>{{ user.username }}</h1>
+
+<form action="{{ url_for('contact.admin_update', id=user.id) }}" method="post">
+    <h3>Attribute setzen</h3>
+
+    <label for="verified">Verifiziert.</label>
+    <input type="checkbox" id="verified" name="verified" value="verified" {{ 'checked' if 'verified' in cert.Flags }}>
+
+    <label for="authority">Autorität.</label>
+    <input type="checkbox" id="authority" name="authority" value="authority" {{ 'checked' if 'authority' in cert.Flags }}>
+
+    <button type="submit" class="button">Aktualisieren</button>
+    <a href="{{ url_for('contact.user', handle=user.certificate.full_handle) }}" class="button secondary">Abbrechen</a>
+</form>
+{% endblock %}
