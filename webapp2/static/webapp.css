@@ -146,6 +146,7 @@ a:hover {
 .folders {
     display: flex;
     margin-bottom: 0.5rem;
+    flex-wrap: wrap;
 }
 .folders a {
     text-decoration: none;

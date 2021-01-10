@@ -101,7 +101,8 @@ def it():
         m.owner = request.user
         m.message_body = own_m
         m.subject = origm.Subject
-        m.is_seen = m.is_opened = m.is_read = False
+        m.is_seen = m.is_read = False
+        m.is_opened = True
         m.sent_date = origm.MessageDate
         db.session.add(m)
         db.session.commit()
