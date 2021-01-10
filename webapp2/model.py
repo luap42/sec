@@ -24,7 +24,7 @@ class User(db.Model):
         'certificate.id'), nullable=False)
     certificate = db.relationship('Certificate',
                                   backref='user', lazy=True)
-    
+
     is_admin = db.Column(db.Boolean, nullable=False)
 
     def __repr__(self):

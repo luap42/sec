@@ -191,7 +191,7 @@ class CertFile:
                 ),
                 hashes.SHA256()
             )
-        except SyntaxError:#InvalidSignature:
+        except SyntaxError:  # InvalidSignature:
             return False
         else:
             return True
@@ -461,7 +461,8 @@ def outputPrivateKey(key, passphrase="-"):
     pem = key.private_bytes(
         encoding=Encoding.PEM,
         format=PrivateFormat.PKCS8,
-        encryption_algorithm=BestAvailableEncryption(passphrase.encode("utf-8"))
+        encryption_algorithm=BestAvailableEncryption(
+            passphrase.encode("utf-8"))
     )
     return pem.decode("utf-8")
 
@@ -474,6 +475,7 @@ def loadPrivateKey(to, type, passphrase="-"):
     f.close()
 
     return load_pem_private_key(pem, password=passphrase, backend=default_backend())
+
 
 def inputPrivateKey(pem, passphrase="-"):
     passphrase = passphrase.encode("utf-8")

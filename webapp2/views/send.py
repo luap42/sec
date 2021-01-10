@@ -21,6 +21,7 @@ def validate_user():
 def index():
     return render_template("send/index.html")
 
+
 @send.route("/forward/<id>")
 def forward(id):
     m = Message.query.filter_by(owner=request.user, id=id).first_or_404()
@@ -129,6 +130,7 @@ def it():
 
     return render_template("send/done.html", code=code, comment=comment)
 
+
 @send.route("/forward/<id>", methods=["POST"])
 def forward_it(id):
     m = Message.query.filter_by(owner=request.user, id=id).first_or_404()
@@ -141,7 +143,8 @@ def forward_it(id):
 
     request.form = request.form.copy()
 
-    request.form['body'] = request.form['body_html'] = request.form['body_raw'] = message.Body.decode("utf-8")
+    request.form['body'] = request.form['body_html'] = request.form['body_raw'] = message.Body.decode(
+        "utf-8")
     request.form['content-type'] = message.DataType
 
     return it()

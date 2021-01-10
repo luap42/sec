@@ -115,6 +115,7 @@ def tds(id):
 
     return render_template('inbox/tds.html', m=m)
 
+
 @inbox.route("/<id>/ultimdel", methods=["GET", "POST"])
 def ultimdel(id):
     m = Message.query.filter_by(owner=request.user, id=id).first_or_404()

@@ -83,6 +83,7 @@ def admin_page(id):
     cert = certfile.cert()
     return render_template("contact/admin_page.html", user=user, cert=cert)
 
+
 @contact.route("/admin/<id>", methods=["POST"])
 def admin_update(id):
     user = User.query.get_or_404(id)
@@ -94,7 +95,7 @@ def admin_update(id):
     server_privkey_sign = sec.loadPrivateKey(
         "cert/server_cert", "sign",
         passphrase=SETTINGS['CERTIFICATE_ENCRYPTION'])
-    
+
     certificate = user.certificate
     certfile = sec.CertFile.parse(certificate.certfile_body)
     cert = certfile.cert(server_cert)
@@ -114,6 +115,5 @@ def admin_update(id):
     certificate.certfile_body = cert_code
     db.session.add(certificate)
     db.session.commit()
-
 
     return redirect(url_for('contact.user', handle=certificate.full_handle))
