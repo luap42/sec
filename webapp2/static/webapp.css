@@ -12,6 +12,7 @@ header {
     padding: 1rem;
     background-color: #000;
     box-shadow: 5px 5px 0 rgba(0,0,0,0.2);
+    color: white;
 }
 header .container {
     display: flex;
@@ -24,6 +25,9 @@ header .brand {
 header a {
     color: white;
     text-decoration: none;
+}
+header .username {
+    margin-right: 1.5rem;
 }
 header a:hover { color: white; text-decoration: none; }
 .container, main {
