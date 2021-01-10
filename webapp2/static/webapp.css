@@ -205,7 +205,7 @@ a:hover {
 }
 
 #pdf_view {
-    height: 60vh;
+    height: 65vh;
     min-height: 500px;
     border: 2px solid #ccc;
     margin-top: 1rem;
@@ -255,4 +255,14 @@ table th {
     font-family: inherit !important;
     padding: 2rem !important;
     line-height: 2 !important;
+}
+.ql-editor.ql-blank::before {
+    left: 2rem !important;
+}
+.ql-toolbar {
+    box-shadow: 2.5px 2.5px 0 rgba(0,0,0,0.1);
+    background-color: #eee !important;
+}
+.ql-container {
+    box-shadow: 2.5px 2.5px 0 rgba(0,0,0,0.1);
 }
