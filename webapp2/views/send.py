@@ -115,7 +115,7 @@ def it():
 
         m = Message()
         m.postbox = 'sent'
-        m.author = request.user.certificate
+        m.author = c
         m.owner = request.user
         m.message_body = own_m
         m.subject = origm.Subject
