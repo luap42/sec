@@ -21,6 +21,18 @@ def validate_user():
 def index():
     return render_template("send/index.html")
 
+@send.route("/forward/<id>")
+def forward(id):
+    m = Message.query.filter_by(owner=request.user, id=id).first_or_404()
+    user_privkey_recv = sec.inputPrivateKey(
+        request.user.private_recv_key.encode("utf-8"), session['password'])
+    message_file = m.message_body
+
+    message = sec.MessageLoader.parse(message_file)
+    message = message.decrypt(user_privkey_recv)
+
+    return render_template("send/forward.html", id=id, message=message, mobj=m)
+
 
 @send.route("/", methods=["POST"])
 def it():
@@ -114,3 +126,20 @@ def it():
         db.session.commit()
 
     return render_template("send/done.html", code=code, comment=comment)
+
+@send.route("/forward/<id>", methods=["POST"])
+def forward_it(id):
+    m = Message.query.filter_by(owner=request.user, id=id).first_or_404()
+    user_privkey_recv = sec.inputPrivateKey(
+        request.user.private_recv_key.encode("utf-8"), session['password'])
+    message_file = m.message_body
+
+    message = sec.MessageLoader.parse(message_file)
+    message = message.decrypt(user_privkey_recv)
+
+    request.form = request.form.copy()
+
+    request.form['body'] = request.form['body_html'] = request.form['body_raw'] = message.Body.decode("utf-8")
+    request.form['content-type'] = message.DataType
+
+    return it()

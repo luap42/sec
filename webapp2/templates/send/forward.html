@@ -1,0 +1,19 @@
+{% extends "layout/application.html" %}
+{% block body %}
+<link rel="stylesheet" href="{{ url_for('static', filename='quill/quill.snow.css') }}"></script>
+<script src="{{ url_for('static', filename='quill/quill.js') }}"></script>
+
+<form action="{{ url_for('send.forward_it', id=mobj.id) }}" method="POST">
+    <button type="submit" class="button is-right-btn">Nachricht absenden</button>
+    <a href="{{ url_for('inbox.message', id=mobj.id) }}" class="button secondary is-right-btn">Abbrechen</a>
+    <h1>Nachricht weiterleiten</h1>
+
+    <label for="recipient">Empfänger</label>
+    <input id="recipient" name="recipient" placeholder="kennung@server">
+
+    <label for="subject">Betreff</label>
+    <input id="subject" name="subject" value="Fwd: {{ mobj.subject }}">
+
+    <p>Leite nur Nachrichten weiter, wenn du dazu berechtigt bist oder die andere Person dies erwartet.</p>
+</form>
+{% endblock %}
