@@ -15,18 +15,18 @@
     <input id="subject" name="subject" value="{{ request.values.get('subject', '') }}">
 
     <div class="folders doctype--selection">
-        <a href="javascript:selectDTP('text/raw')" data-dt="text/raw" class="current">Unformattierter Text</a>
-        <a href="javascript:selectDTP('text/html')" data-dt="text/html" >Normaler Text</a>
+        <a href="javascript:selectDTP('text/raw')" data-dt="text/raw">Unformattierter Text</a>
+        <a href="javascript:selectDTP('text/html')" data-dt="text/html" class="current">Normaler Text</a>
         <a href="javascript:selectDTP('application/pdf')" data-dt="application/pdf" >PDF Hochladen</a>
     </div>
 
-    <input type="hidden" name="content-type" id="content-type" value="text/raw">
+    <input type="hidden" name="content-type" id="content-type" value="text/html">
 
-    <div class="doctype--partial is-raw is-active">
+    <div class="doctype--partial is-raw">
         <textarea id="body_raw" name="body_raw"></textarea>
     </div>
 
-    <div class="doctype--partial is-html">
+    <div class="doctype--partial is-html is-active">
         <div id="body_html"></div>
         <input type="hidden" name="body_html" id="body_html-input">
     </div>
