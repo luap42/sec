@@ -1,7 +1,7 @@
 from flask import *
 from hashlib import sha256
 
-from ..model import db, User, Certificate
+from ..model import db, User, Certificate, validate_handle
 from ..config import SETTINGS
 from .. import sec
 
@@ -41,7 +41,7 @@ def signup():
         passwd_hash = sha256(
             request.form['password'].encode("utf-8")).digest()
         name, handle, pw = request.form["full_name"], request.form["username"], request.form["password"]
-        if handle.isidentifier():
+        if validate_handle(handle):
             data = _create_user(name, handle, pw, passwd_hash)
             errors += data["errors"]
         else:

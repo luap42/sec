@@ -4,7 +4,7 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from flask import *
 import urllib
 
-from ..model import db, User, Certificate, Message
+from ..model import db, User, Certificate, Message, validate_handle
 from ..config import SETTINGS
 from .. import sec
 
@@ -52,7 +52,7 @@ def certfile_challenge():
 
 @api.route("/user/<handle>/certfile")
 def user_certfile(handle):
-    if handle.isidentifier():
+    if validate_handle(handle):
         u = User.query.filter_by(username=handle).first_or_404()
         return u.certificate.certfile_body
     else:
@@ -62,7 +62,7 @@ def user_certfile(handle):
 @api.route("/user/<handle>/recv", methods=["POST"])
 def user_recv(handle):
     try:
-        if handle.isidentifier():
+        if validate_handle(handle):
             u = User.query.filter_by(username=handle).first_or_404()
             message = request.get_data().decode("utf-8")
 

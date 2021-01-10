@@ -51,3 +51,10 @@ class Message(db.Model):
 
     def __repr__(self):
         return '<Certificate %r>' % self.full_handle
+
+
+def validate_handle(handle):
+    allowed_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" \
+                    "0123456789._-"
+    handle = [*handle]
+    return False not in [i in allowed_chars for i in handle]
