@@ -1,0 +1,17 @@
+{% extends "layout/application.html" %}
+{% block body %}
+
+{% if code == "OK" %}
+<h1>Nachricht gesendet!</h1>
+<p>Die Nachricht wurde erfolgreich abgesendet.</p>
+<a href="{{ url_for('inbox.sent') }}" class="button">Gesendete Nachrichten anzeigen</a>
+<a href="{{ url_for('inbox.index') }}" class="button">Posteingang anzeigen</a>
+{% else %}
+<h1>Uups.</h1>
+<p>Die Nachricht wurde offenbar nicht angenommen.</p>
+<a href="javascript:window.location.reload()" class="button secondary">Erneut versuchen</a>
+<p>Der Server meldet:</p>
+<pre><code><strong>{{ code }}:</strong> {{ comment }}</code></pre>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "layout/application.html" %}
+{% block body %}
+<form action="{{ url_for('send.it') }}" method="POST">
+    <button type="submit" class="button is-right-btn">Nachricht absenden</button>
+    <a href="{{ url_for('inbox.index') }}" class="button secondary is-right-btn">Abbrechen</a>
+    <h1>Nachricht senden</h1>
+
+    <label for="recipient">Empfänger</label>
+    <input id="recipient" name="recipient" placeholder="kennung@server" value="{{ request.values.get('reply_to', '') }}">
+
+    <label for="subject">Betreff</label>
+    <input id="subject" name="subject" value="{{ request.values.get('subject', '') }}">
+
+    <label for="body">Nachricht</label>
+    <textarea id="body" name="body"></textarea>
+</form>
+{% endblock %}

@@ -12,11 +12,13 @@ db.init_app(app)
 
 from .views.auth import auth
 from .views.inbox import inbox
+from .views.send import send
 from .views.api import api
 
 app.register_blueprint(auth, url_prefix="/auth")
 app.register_blueprint(inbox, url_prefix="/inbox")
 app.register_blueprint(api, url_prefix="/api")
+app.register_blueprint(send, url_prefix="/send")
 
 
 @app.route("/")

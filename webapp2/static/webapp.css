@@ -65,7 +65,7 @@ input, textarea {
 }
 textarea {
     resize: vertical;
-    min-height: 5rem;
+    min-height: 25rem;
 }
 label {
     cursor: pointer;

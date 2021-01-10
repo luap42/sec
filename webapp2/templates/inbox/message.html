@@ -1,8 +1,12 @@
 {% extends "layout/application.html" %}
 {% block body %}
 <a href="{{ url_for('inbox.index') }}" class="nav-btn">&laquo; Zurück zum Posteingang</a>
-<a href="" class="button is-right-btn">Antworten</a>
-<a href="{{ url_for('inbox.tds', id=mobj.id) }}" class="button secondary is-right-btn">{% if mobj.postbox in ['inbox', 'sent'] %}Löschen{% else %}Wiederherstellen{% endif %}</a>
+{% if mobj.postbox in ['inbox', 'sent'] %}
+    <a href="{{ url_for('send.index', subject='Re: ' + message.Subject, reply_to=message.Author) }}" class="button is-right-btn">Antworten</a>
+    <a href="{{ url_for('inbox.tds', id=mobj.id) }}" class="button secondary is-right-btn">Löschen</a>
+{% else %}
+    <a href="{{ url_for('inbox.tds', id=mobj.id) }}" class="button is-right-btn">Wiederherstellen</a>
+{% endif %}
 <h1>{{ message.Subject }}</h1>
 <div class="meta">
     <div class="meta--field">
