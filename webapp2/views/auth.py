@@ -15,6 +15,7 @@ def signoff():
     del session["user_id"]
     return redirect(url_for('index'))
 
+
 @auth.route("/signin", methods=["GET", "POST"])
 def signin():
     errors = []
@@ -76,7 +77,6 @@ def _create_user(name, handle, pw, pw_hash):
     c.full_handle = (handle + '@' + SETTINGS['SERVER_URL']).encode("utf-8")
     c.certfile_body = cert.encode('utf-8')
     c.is_validated = True
-
 
     u = User()
     u.username = handle.encode('utf-8')

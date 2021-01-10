@@ -1,11 +1,11 @@
+from . import sec
 from .config import SETTINGS
 from .model import db
 from .app import app
 
-import sys, os
+import sys
+import os
 sys.path.append("..")
-
-import protocol.reference as sec
 
 
 with app.app_context():

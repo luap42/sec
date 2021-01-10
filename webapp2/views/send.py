@@ -26,7 +26,8 @@ def index():
 def it():
     to, subject, body = request.form['recipient'], request.form['subject'], request.form['body']
     c = Certificate.query.filter_by(full_handle=to).first()
-    own_cert = sec.CertFile.parse(request.user.certificate.certfile_body).cert()
+    own_cert = sec.CertFile.parse(
+        request.user.certificate.certfile_body).cert()
     to_handle, to_server = to.split('@')
 
     if c is None:
@@ -69,7 +70,6 @@ def it():
     user_privkey_sign = sec.inputPrivateKey(
         request.user.private_sign_key.encode("utf-8"), session['password'])
 
-    
     recipient_cert = sec.CertFile.parse(c.certfile_body).cert()
 
     origm = sec.Message(subject, "text/raw", body.encode("utf-8"),

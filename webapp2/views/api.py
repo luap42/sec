@@ -9,12 +9,12 @@ from ..config import SETTINGS
 from .. import sec
 
 
-
 api = Blueprint("api", __name__)
+
 
 @api.after_request
 def add_text_header(resp):
-    resp.headers['Content-type']='text/plain;charset=utf-8'
+    resp.headers['Content-type'] = 'text/plain;charset=utf-8'
     return resp
 
 
@@ -98,7 +98,8 @@ def user_recv(handle):
                 if not origin_certfile.verify(origin_service_cert):
                     return "REJECTED\nOrigin verification failed due to invalid certification chain."
 
-            author = Certificate.query.filter_by(full_handle=from_handle + '@' + from_server).first()
+            author = Certificate.query.filter_by(
+                full_handle=from_handle + '@' + from_server).first()
             if author is None:
                 author = Certificate()
                 author.name = origin_cert.Name
