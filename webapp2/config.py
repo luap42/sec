@@ -52,6 +52,15 @@ SETTINGS = {
     'CERTIFICATE_ENCRYPTION': 'sec.webapp2.cert-key',
     #
     # #########################################################################
+    #
+    # CONFIRM_READ
+    # ------------
+    # Whether this Service confirms the read status for messages sent to it or not and,
+    # at the same time whether it shall set the "readconfirm" flag.
+    #
+    'CONFIRM_READ': True,
+    #
+    # #########################################################################
 
     'trustlist': [
         'localhost:5000',
