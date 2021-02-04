@@ -1,6 +1,6 @@
 from flask import *
 from hashlib import sha256
-import pdfkit
+import pdfkit, urllib
 
 from ..model import db, User, Certificate, Message
 from ..config import SETTINGS
@@ -56,7 +56,11 @@ def message(id):
     m.subject = message.Subject
     db.session.add(m)
     db.session.commit()
-    return render_template("inbox/message.html", id=id, message=message, mobj=m)
+
+    read_confirm(m, message, 'DECRYPTED')
+
+    return render_template("inbox/message.html", id=id,
+                           message=message, mobj=m)
 
 
 @inbox.route("/<id>/pdf")
@@ -93,6 +97,9 @@ def message_pdf(id):
 
     http_response = make_response(pdf)
     http_response.headers["Content-Type"] = "application/pdf"
+
+    read_confirm(m, message, 'READ')
+
     return http_response
 
 
@@ -139,3 +146,20 @@ def safe_decode(txt):
     txt = txt.replace('\n\n', '</p><p>').replace('\n', '<br>')
 
     return txt
+
+def read_confirm(m, message, status):
+    if m.origin_id:
+        return None
+
+    to_handle, to_server = message.Author.split('@')
+
+    req = urllib.request.Request(
+        "http://" + to_server + "/api/user/" + to_handle + "/confirm")
+    req.method = "POST"
+    req.data = (status + "\n" + str(m.id)).encode("utf-8")
+    try:
+        with urllib.request.urlopen(req) as res:
+            response = res.read().decode("utf-8")
+        return True
+    except SyntaxError:
+        return False

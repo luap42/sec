@@ -73,7 +73,8 @@ def user_certfile(handle):
 def user_recv(handle):
     try:
         if handle.isidentifier():
-            if os.path.isdir(os.path.abspath("./storage/users/" + handle + "/")):
+            if os.path.isdir(os.path.abspath(
+                    "./storage/users/" + handle + "/")):
                 message_id = str(uuid.uuid4())
                 message = request.get_data().decode("utf-8")
 

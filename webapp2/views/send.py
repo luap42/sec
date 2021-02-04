@@ -61,7 +61,8 @@ def it():
             to_certfile = sec.CertFile.parse(to_cert)
             to_cert = to_certfile.cert()
         except SyntaxError:
-            return render_template("send/done.html", code="ERROR", comment="Verschlüsselungszertifikat nicht erreichbar.")
+            return render_template("send/done.html", code="ERROR",
+                                   comment="Verschlüsselungszertifikat nicht erreichbar.")
 
         trustlist = SETTINGS['trustlist']
 
@@ -73,13 +74,16 @@ def it():
                     to_service_cert)
                 to_service_cert = to_service_certfile.cert()
             except SyntaxError:
-                return render_template("send/done.html", code="ERROR", comment="Verschlüsselungszertifikat des Anbieters des Empfängers nicht erreichbar.")
+                return render_template(
+                    "send/done.html", code="ERROR", comment="Verschlüsselungszertifikat des Anbieters des Empfängers nicht erreichbar.")
 
             if not to_service_certfile.verify():
-                return render_template("send/done.html", code="ERROR", comment="Verschlüsselungszertifikat des Anbieters des Empfängers spezifikationswidrig nicht eigensigniert.")
+                return render_template(
+                    "send/done.html", code="ERROR", comment="Verschlüsselungszertifikat des Anbieters des Empfängers spezifikationswidrig nicht eigensigniert.")
 
             if not to_certfile.verify(to_service_cert):
-                return render_template("send/done.html", code="ERROR", comment="Verschlüsselungszertifikat Empfängers nicht ordnungsgemäß signiert.")
+                return render_template(
+                    "send/done.html", code="ERROR", comment="Verschlüsselungszertifikat Empfängers nicht ordnungsgemäß signiert.")
 
         c = Certificate()
         c.name = to_cert.Name
@@ -107,7 +111,7 @@ def it():
     try:
         with urllib.request.urlopen(req) as res:
             response = res.read().decode("utf-8")
-    except:
+    except BaseException:
         response = "ERROR\nServer-Fehler"
 
     code, comment = response.split("\n", maxsplit=1)
@@ -124,6 +128,7 @@ def it():
         m.subject = origm.Subject
         m.is_seen = m.is_read = False
         m.is_opened = True
+        m.origin_id = comment
         m.sent_date = origm.MessageDate
         db.session.add(m)
         db.session.commit()

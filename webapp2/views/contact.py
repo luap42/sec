@@ -32,7 +32,7 @@ def user(handle):
         original_cert = the_cert
         the_certfile = sec.CertFile.parse(the_cert)
         the_cert = the_certfile.cert()
-    except:
+    except BaseException:
         print("TC not fetchable")
         trust_status = 'broken'
 
@@ -40,11 +40,11 @@ def user(handle):
         try:
             with urllib.request.urlopen("http://" + cert_server + "/api/certfile") as oc:
                 origin_service_cert = oc.read().decode("utf-8")
-                print('***'*50)
+                print('***' * 50)
             origin_service_certfile = sec.CertFile.parse(
                 origin_service_cert)
             origin_service_cert = origin_service_certfile.cert()
-        except:
+        except BaseException:
             print("OSC not fetchable")
             trust_status = 'broken'
 
@@ -72,7 +72,8 @@ def user(handle):
         db.session.add(cert)
         db.session.commit()
 
-    return render_template("contact/user.html", cert=cert, sec_cert=sec_cert, trust_status=trust_status)
+    return render_template("contact/user.html", cert=cert,
+                           sec_cert=sec_cert, trust_status=trust_status)
 
 
 @contact.route("/admin/<id>")

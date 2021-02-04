@@ -4,7 +4,10 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from flask import *
 import urllib
 
-from ..model import db, User, Certificate, Message, validate_handle
+from datetime import datetime
+
+from ..model import db, User, Certificate, Message, MessageEvent, \
+    validate_handle
 from ..config import SETTINGS
 from .. import sec
 
@@ -59,6 +62,30 @@ def user_certfile(handle):
         abort(400)
 
 
+@api.route("/user/<handle>/confirm", methods=["POST"])
+def user_confirm(handle):
+    if validate_handle(handle):
+
+        u = User.query.filter_by(username=handle).first_or_404()
+
+        confirm_data = request.get_data().decode("utf-8")
+        status, message_id = confirm_data.split("\n")
+
+        msg = Message.query.filter_by(origin_id=message_id).first_or_404()
+
+        ev = MessageEvent()
+        ev.message = msg
+        ev.status = status
+        ev.event_date = datetime.now()
+
+        db.session.add(ev)
+        db.session.commit()
+
+        return "OK"
+    else:
+        abort(400)
+
+
 @api.route("/user/<handle>/recv", methods=["POST"])
 def user_recv(handle):
     try:
@@ -75,7 +102,7 @@ def user_recv(handle):
                 original_cert = origin_cert
                 origin_certfile = sec.CertFile.parse(origin_cert)
                 origin_cert = origin_certfile.cert()
-            except:
+            except BaseException:
                 return "REJECTED\nOrigin verification not possible."
 
             if not m.verify(origin_cert):
@@ -90,7 +117,7 @@ def user_recv(handle):
                     origin_service_certfile = sec.CertFile.parse(
                         origin_service_cert)
                     origin_service_cert = origin_service_certfile.cert()
-                except:
+                except BaseException:
                     return "REJECTED\nOrigin Service verification not possible."
 
                 if not origin_service_certfile.verify():

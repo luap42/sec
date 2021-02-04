@@ -66,8 +66,9 @@ def write_do():
             cfc = cf.read().decode("utf-8")
         recipient_cert = sec.CertFile.parse(cfc)
         recipient_cert = recipient_cert.cert()
-    except:
-        return render_template("write_done.html", code="ERROR", comment="Verschlüsselungszertifikat nicht erreichbar")
+    except BaseException:
+        return render_template("write_done.html", code="ERROR",
+                               comment="Verschlüsselungszertifikat nicht erreichbar")
 
     user_privkey_sign = sec.loadPrivateKey(
         "storage/users/" + session["user"] + "/cert/user", "sign", passphrase=session["password"])
@@ -84,7 +85,7 @@ def write_do():
     try:
         with urllib.request.urlopen(req) as res:
             response = res.read().decode("utf-8")
-    except:
+    except BaseException:
         response = "ERROR\nServer-Fehler"
 
     code, comment = response.split("\n")
@@ -97,11 +98,12 @@ def login():
     if request.method == "POST":
         handle, pw = request.form["handle"], request.form["password"]
         if handle.isidentifier():
-            if os.path.isdir(os.path.abspath("./storage/users/" + handle + "/")):
+            if os.path.isdir(os.path.abspath(
+                    "./storage/users/" + handle + "/")):
                 try:
                     sec.loadPrivateKey(
-                        "storage/users/"+handle+"/cert/user", "recv", passphrase=pw)
-                except:
+                        "storage/users/" + handle + "/cert/user", "recv", passphrase=pw)
+                except BaseException:
                     error = "Dieses Benutzerkonto existiert nicht."
             else:
                 error = "Dieses Benutzerkonto existiert nicht."
@@ -123,7 +125,8 @@ def register():
     if request.method == "POST":
         name, handle, pw = request.form["name"], request.form["handle"], request.form["password"]
         if handle.isidentifier():
-            if not os.path.isdir(os.path.abspath("./storage/users/" + handle + "/")):
+            if not os.path.isdir(os.path.abspath(
+                    "./storage/users/" + handle + "/")):
                 error = _generate_user_data(name, handle, pw)
             else:
                 error = "Dieses Benutzerkonto existiert bereits."

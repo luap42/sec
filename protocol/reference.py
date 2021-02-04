@@ -124,7 +124,8 @@ Authorize: {"self" if self.Authorize is None else self.Authorize.Handle}
         pubkey_sign, privkey_sign = key_sign
         pubkey_recv, privkey_recv = key_recv
 
-        return Certificate(Type, Name, Handle, pubkey_sign, pubkey_recv, Flags, datetime.now(), Authorize), privkey_sign, privkey_recv
+        return Certificate(Type, Name, Handle, pubkey_sign, pubkey_recv,
+                           Flags, datetime.now(), Authorize), privkey_sign, privkey_recv
 
     @classmethod
     def newService(cls, Name, URL):
@@ -390,7 +391,8 @@ class MessageLoader:
         del msgdata["Message"], msgdata["Key"]
         msgdata["Body"] = b64decode(msgdata["Body"].encode("utf-8"))
 
-        return Message(msgdata["Subject"], msgdata["DataType"], msgdata["Body"], msgdata["Author"], None, datetime.fromisoformat(msgdata["MessageDate"]))
+        return Message(msgdata["Subject"], msgdata["DataType"], msgdata["Body"],
+                       msgdata["Author"], None, datetime.fromisoformat(msgdata["MessageDate"]))
 
     @classmethod
     def load(cls, file_name):
@@ -474,12 +476,14 @@ def loadPrivateKey(to, type, passphrase="-"):
     pem = f.read()
     f.close()
 
-    return load_pem_private_key(pem, password=passphrase, backend=default_backend())
+    return load_pem_private_key(
+        pem, password=passphrase, backend=default_backend())
 
 
 def inputPrivateKey(pem, passphrase="-"):
     passphrase = passphrase.encode("utf-8")
-    return load_pem_private_key(pem, password=passphrase, backend=default_backend())
+    return load_pem_private_key(
+        pem, password=passphrase, backend=default_backend())
 
 
 def _readFormat(format):
@@ -494,7 +498,8 @@ def _readFormat(format):
             while i < len(format) and ": " not in format[i]:
                 value += format[i]
                 i += 1
-            # Decrement once more at last. So that the end line is counted normally too
+            # Decrement once more at last. So that the end line is counted
+            # normally too
             i -= 1
 
         data[key.strip()] = value.strip()

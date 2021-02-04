@@ -38,6 +38,7 @@ class Message(db.Model):
         'certificate.id'), nullable=False)
     author = db.relationship('Certificate',
                              backref='message', lazy=True)
+    origin_id = db.Column(db.String(255))
 
     owner_id = db.Column(db.Integer, db.ForeignKey(
         'user.id'), nullable=False)
