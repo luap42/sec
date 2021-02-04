@@ -34,4 +34,36 @@
 <script>PDFObject.embed("{{ url_for('inbox.message_pdf', id=mobj.id) }}", "#pdf_view",
                         { forcePDFJS: true, PDFJS_URL: "{{ url_for('static', filename='pdfjs/web/viewer.html') }}"});</script>
 {% endif %}
+{% if mobj.origin_id != None %}
+<h3>Zustellstatus</h3>
+<table>
+    <tr>
+        <th>Zeitpunkt?</th>
+        <th>Status</th>
+    </tr>
+    {% for ev in mobj.message_event %}
+    <tr>
+        <td>{{ ev.event_date }}</td>
+        <td>{% if ev.status == "STORED" %}
+            <strong>Gespeichert.</strong>
+            Die Nachricht wurde auf dem lokalen Server der Empfängerin/des Empfängers gespeichert.
+            {% elif ev.status == "DECRYPTED" %}
+            <strong>Entschlüsselt.</strong>
+            Die Nachricht wurde erstmalig entschlüsselt.
+            {% elif ev.status == "READ" %}
+            <strong>Gelesen.</strong>
+            Die Empfängerin/Der Empfänger hat die Nachricht geöffnet und gelesen.
+            {% elif ev.status == "NOTIFIED" %}
+            <strong>Benachrichtigt.</strong>
+            Die Empfängerin/Der Empfänger wurde über die Nachricht informiert.
+            {% else %}{{ ev.status }}{% endif %}
+        </td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="2">Noch keine Ereignisse.</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
 {% endblock %}

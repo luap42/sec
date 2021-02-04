@@ -52,12 +52,15 @@ def message(id):
     message = sec.MessageLoader.parse(message_file)
     message = message.decrypt(user_privkey_recv)
 
-    m.is_seen = m.is_opened = m.is_read = True
+    is_opened = m.is_opened
+
+    m.is_seen = m.is_opened = True
     m.subject = message.Subject
     db.session.add(m)
     db.session.commit()
 
-    read_confirm(m, message, 'DECRYPTED')
+    if not is_opened:
+        read_confirm(m, message, 'DECRYPTED')
 
     return render_template("inbox/message.html", id=id,
                            message=message, mobj=m)
@@ -98,7 +101,14 @@ def message_pdf(id):
     http_response = make_response(pdf)
     http_response.headers["Content-Type"] = "application/pdf"
 
-    read_confirm(m, message, 'READ')
+    is_read = m.is_read
+
+    m.is_read = True
+    db.session.add(m)
+    db.session.commit()
+
+    if not is_read:
+        read_confirm(m, message, 'READ')
 
     return http_response
 
