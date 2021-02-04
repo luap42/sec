@@ -1,6 +1,7 @@
 from flask import *
 from hashlib import sha256
-import pdfkit, urllib
+import pdfkit
+import urllib
 
 from ..model import db, User, Certificate, Message
 from ..config import SETTINGS
@@ -35,9 +36,8 @@ def sent():
 
 @inbox.route("/deleted")
 def deleted():
-    messages = Message.query.filter_by(owner=request.user, postbox='deleted_inbox').all() + \
-        Message.query.filter_by(
-            owner=request.user, postbox='deleted_sent').all()
+    messages = Message.query.filter_by(owner=request.user, postbox='deleted_inbox').all(
+    ) + Message.query.filter_by(owner=request.user, postbox='deleted_sent').all()
     messages = sorted(messages, reverse=True, key=lambda m: m.sent_date)
     return render_template("inbox/deleted.html", messages=messages)
 
@@ -156,6 +156,7 @@ def safe_decode(txt):
     txt = txt.replace('\n\n', '</p><p>').replace('\n', '<br>')
 
     return txt
+
 
 def read_confirm(m, message, status):
     if m.origin_id:

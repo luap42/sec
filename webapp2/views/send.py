@@ -61,8 +61,10 @@ def it():
             to_certfile = sec.CertFile.parse(to_cert)
             to_cert = to_certfile.cert()
         except SyntaxError:
-            return render_template("send/done.html", code="ERROR",
-                                   comment="Verschlüsselungszertifikat nicht erreichbar.")
+            return render_template(
+                "send/done.html",
+                code="ERROR",
+                comment="Verschlüsselungszertifikat nicht erreichbar.")
 
         trustlist = SETTINGS['trustlist']
 
@@ -75,15 +77,21 @@ def it():
                 to_service_cert = to_service_certfile.cert()
             except SyntaxError:
                 return render_template(
-                    "send/done.html", code="ERROR", comment="Verschlüsselungszertifikat des Anbieters des Empfängers nicht erreichbar.")
+                    "send/done.html",
+                    code="ERROR",
+                    comment="Verschlüsselungszertifikat des Anbieters des Empfängers nicht erreichbar.")
 
             if not to_service_certfile.verify():
                 return render_template(
-                    "send/done.html", code="ERROR", comment="Verschlüsselungszertifikat des Anbieters des Empfängers spezifikationswidrig nicht eigensigniert.")
+                    "send/done.html",
+                    code="ERROR",
+                    comment="Verschlüsselungszertifikat des Anbieters des Empfängers spezifikationswidrig nicht eigensigniert.")
 
             if not to_certfile.verify(to_service_cert):
                 return render_template(
-                    "send/done.html", code="ERROR", comment="Verschlüsselungszertifikat Empfängers nicht ordnungsgemäß signiert.")
+                    "send/done.html",
+                    code="ERROR",
+                    comment="Verschlüsselungszertifikat Empfängers nicht ordnungsgemäß signiert.")
 
         c = Certificate()
         c.name = to_cert.Name

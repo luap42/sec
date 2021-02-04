@@ -391,8 +391,14 @@ class MessageLoader:
         del msgdata["Message"], msgdata["Key"]
         msgdata["Body"] = b64decode(msgdata["Body"].encode("utf-8"))
 
-        return Message(msgdata["Subject"], msgdata["DataType"], msgdata["Body"],
-                       msgdata["Author"], None, datetime.fromisoformat(msgdata["MessageDate"]))
+        return Message(
+            msgdata["Subject"],
+            msgdata["DataType"],
+            msgdata["Body"],
+            msgdata["Author"],
+            None,
+            datetime.fromisoformat(
+                msgdata["MessageDate"]))
 
     @classmethod
     def load(cls, file_name):
