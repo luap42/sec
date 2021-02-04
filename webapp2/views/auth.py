@@ -65,8 +65,12 @@ def _create_user(name, handle, pw, pw_hash):
         "cert/server_cert", "sign",
         passphrase=SETTINGS['CERTIFICATE_ENCRYPTION'])
 
+    flags = []
+    if SETTINGS['CONFIRM_READ']:
+        flags += ['readconfirm']
+
     cert, privkey_sign, privkey_recv = sec.Certificate.newUser(
-        name, handle + "@" + server_cert.Handle, [], server_cert)
+        name, handle + "@" + server_cert.Handle, flags, server_cert)
 
     cert = cert.build_signed(server_privkey_sign)
     privkey_sign = sec.outputPrivateKey(privkey_sign, passphrase=pw)

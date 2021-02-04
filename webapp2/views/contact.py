@@ -104,11 +104,16 @@ def admin_update(id):
         cert.Flags.remove('verified')
     if 'authority' in cert.Flags:
         cert.Flags.remove('authority')
+    if 'readconfirm' in cert.Flags:
+        cert.Flags.remove('readconfirm')
 
     if 'verified' in request.form.keys():
         cert.Flags.append('verified')
     if 'authority' in request.form.keys():
         cert.Flags.append('authority')
+
+    if SETTINGS['CONFIRM_READ']:
+        cert.Flags.append('readconfirm')
 
     cert_code = cert.build_signed(server_privkey_sign)
 

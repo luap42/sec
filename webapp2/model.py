@@ -55,6 +55,20 @@ class Message(db.Model):
         return '<Certificate %r>' % self.full_handle
 
 
+class MessageEvent(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    message_id = db.Column(db.Integer, db.ForeignKey(
+        'message.id'), nullable=False)
+    message = db.relationship('Message', backref='message_event', lazy=True)
+
+    status = db.Column(db.String(50), nullable=False)
+    event_date = db.Column(db.DateTime, nullable=False)
+
+    def __repr__(self):
+        return '<Certificate %r>' % self.full_handle
+
+
 def validate_handle(handle):
     allowed_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" \
                     "0123456789._-"
