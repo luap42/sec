@@ -1,12 +1,13 @@
-import sys, os
+import _ui
+import _api
+from flask import *
+import sys
+import os
 sys.path.append("..")
 
-from flask import *
-
-import _api, _ui
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = "aaaaaaaaaaaa" # os.urandom(12)
+app.config['SECRET_KEY'] = "aaaaaaaaaaaa"  # os.urandom(12)
 
 app.register_blueprint(_api.api, url_prefix="/api")
 app.register_blueprint(_ui.ui)

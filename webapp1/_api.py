@@ -12,9 +12,10 @@ sys.path.append("..")
 
 api = Blueprint("api", __name__)
 
+
 @api.after_request
 def add_text_header(resp):
-    resp.headers['Content-type']='text/plain;charset=utf-8'
+    resp.headers['Content-type'] = 'text/plain;charset=utf-8'
     return resp
 
 
