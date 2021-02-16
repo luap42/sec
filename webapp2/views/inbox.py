@@ -172,5 +172,5 @@ def read_confirm(m, message, status):
         with urllib.request.urlopen(req) as res:
             response = res.read().decode("utf-8")
         return True
-    except SyntaxError:
+    except:
         return False

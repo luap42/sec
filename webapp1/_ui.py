@@ -1,10 +1,10 @@
-import protocol.reference as sec
 from flask import *
 from datetime import datetime
 import os
 import urllib
 import sys
 sys.path.append("..")
+import protocol.reference as sec
 
 
 ui = Blueprint("ui", __name__)

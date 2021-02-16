@@ -20,7 +20,7 @@ SETTINGS = {
     # This setting contains the URL under which the webapp2 application will be
     # p u b l i c l y  available under, without any "https://" in front of it.
     #
-    'SERVER_URL': 'localhost:5000',
+    'SERVER_URL': 'localhost:5001',
     #
     # #########################################################################
     #
@@ -65,5 +65,7 @@ SETTINGS = {
     'trustlist': [
         'localhost:5000',
         'localhost:5001',
+        'Pluto12:5000',
+        'Pluto12:5001'
     ]
 }

@@ -57,7 +57,7 @@ def it():
         try:
             with urllib.request.urlopen("http://" + to_server + "/api/user/" + to_handle + "/certfile") as tc:
                 to_cert = tc.read().decode("utf-8")
-            original_cert = origin_cert
+            original_cert = to_cert
             to_certfile = sec.CertFile.parse(to_cert)
             to_cert = to_certfile.cert()
         except SyntaxError:
@@ -68,7 +68,7 @@ def it():
 
         trustlist = SETTINGS['trustlist']
 
-        if from_server not in trustlist:
+        if to_server not in trustlist:
             try:
                 with urllib.request.urlopen("http://" + to_server + "/api/certfile") as tsc:
                     to_service_cert = tsc.read().decode("utf-8")
@@ -95,7 +95,7 @@ def it():
 
         c = Certificate()
         c.name = to_cert.Name
-        c.full_handle = from_handle + '@' + from_server
+        c.full_handle = to_handle + '@' + to_server
         c.certfile_body = original_cert
         c.is_validated = True
 

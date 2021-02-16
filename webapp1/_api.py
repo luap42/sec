@@ -2,12 +2,12 @@ from base64 import b64encode, b64decode
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from flask import *
-import protocol.reference as sec
 import sys
 import os
 import uuid
 import urllib
 sys.path.append("..")
+import protocol.reference as sec
 
 
 api = Blueprint("api", __name__)
